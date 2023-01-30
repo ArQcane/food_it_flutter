@@ -4,11 +4,11 @@ import 'package:food_it_flutter/domain/user/user_repository.dart';
 
 import 'local/local_user_dao.dart';
 
-class UserRepoImpl implements UserRepository {
+class UserRepositoryImpl implements UserRepository {
   final RemoteUserDao _remoteUserDao;
   final LocalUserDao _localUserDao;
 
-  UserRepoImpl({
+  UserRepositoryImpl({
     required RemoteUserDao remoteUserDao,
     required LocalUserDao localUserDao,
   })  : _remoteUserDao = remoteUserDao,

@@ -7,7 +7,6 @@ class Restaurant {
   late String biography;
   late String opening_hours;
   late String region;
-  late String image;
   late String restaurant_logo;
   late double location_lat;
   late double location_long;
@@ -23,7 +22,6 @@ class Restaurant {
     required this.biography,
     required this.opening_hours,
     required this.region,
-    required this.image,
     required this.restaurant_logo,
     required this.location_lat,
     required this.location_long,
@@ -40,7 +38,6 @@ class Restaurant {
     biography = json['biography'];
     opening_hours = json['opening_hours'];
     region = json['region'];
-    image = json['image'];
     restaurant_logo = json['restaurant_logo'];
     location_lat = json['location_lat'];
     location_long = json['location_long'];
@@ -58,7 +55,6 @@ class Restaurant {
     data['biography'] = biography;
     data['opening_hours'] = opening_hours;
     data['region'] = region;
-    data['image'] = image;
     data['restaurant_logo'] = restaurant_logo;
     data['location_lat'] = location_lat;
     data['location_long'] = location_long;

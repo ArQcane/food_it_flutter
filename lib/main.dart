@@ -1,35 +1,52 @@
 import 'package:flutter/material.dart';
-void main() {
-  runApp(const MyApp());
-}
+import 'package:food_it_flutter/data/review/remote/remote_review_dao_impl.dart';
+import 'package:food_it_flutter/data/review/review_repository_impl.dart';
+import 'package:food_it_flutter/data/user/local/local_user_dao_impl.dart';
+import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
+import 'package:food_it_flutter/providers_viewmodels/restaurant_provider.dart';
+import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
+import 'package:food_it_flutter/ui/foodit_app.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+import 'data/restaurant/remote/remote_restaurant_dao_impl.dart';
+import 'data/restaurant/restaurant_repository_impl.dart';
+import 'data/user/remote/remote_user_dao_impl.dart';
+import 'data/user/user_repository_impl.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  var sharedPreferences = await SharedPreferences.getInstance();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'FoodIt!',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const HomeScreen(),
-    );
-  }
-}
+  var userRepo = UserRepositoryImpl(
+    remoteUserDao: RemoteUserDaoImpl(),
+    localUserDao: LocalUserDaoImpl(
+      preferences: sharedPreferences,
+    ),
+  );
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  var restaurantRepo = RestaurantRepositoryImpl(
+    restaurantDao: RemoteRestaurantDaoImpl(),
+  );
+  var reviewRepo = ReviewRepositoryImpl(
+    remoteCommentDao: RemoteReviewDaoImpl(),
+  );
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Hello world")),
-      body: Container(
-        alignment: Alignment.center,
-        child: const Text("Hello World"),
-      ),
-    );
-  }
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => AuthenticationProvider(context, userRepo),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => RestaurantProvider(context, restaurantRepo),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ReviewProvider(context, reviewRepo),
+        ),
+      ],
+      child: const FoodItApp(),
+    ),
+  );
+
+
 }

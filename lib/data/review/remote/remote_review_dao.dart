@@ -1,6 +1,6 @@
-import 'package:food_it_flutter/domain/review/review.dart';
+import '../../../domain/review/review.dart';
 
-abstract class ReviewRepository {
+abstract class RemoteReviewDao{
   Future<List<Review>> getAllReviews();
   Future<Review> getReviewsById({required String id});
   Future<List<Review>> getReviewsByUser({required String userId});
