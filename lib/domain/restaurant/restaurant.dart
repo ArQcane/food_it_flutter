@@ -1,3 +1,5 @@
+import '../../data/utils/network_utils.dart';
+
 class Restaurant {
   late int restaurant_id;
   late String restaurant_name;
@@ -32,15 +34,15 @@ class Restaurant {
   Restaurant.fromJson(Map<String, dynamic> json) {
     restaurant_id = json['restaurant_id'];
     restaurant_name = json['restaurant_name'];
-    average_price_range = json['average_price_range'];
-    average_rating = json['average_rating'];
+    average_price_range = json['average_price_range'].toDouble();
+    average_rating = json['average_rating'].toDouble();
     cuisine = json['cuisine'];
     biography = json['biography'];
     opening_hours = json['opening_hours'];
     region = json['region'];
-    restaurant_logo = json['restaurant_logo'];
-    location_lat = json['location_lat'];
-    location_long = json['location_long'];
+    restaurant_logo = NetworkUtils.baseUrl + json['restaurant_logo'];
+    location_lat = json['location_lat'].toDouble();
+    location_long = json['location_long'].toDouble();
     location = json['location'];
     restaurant_banner = json['restaurant_banner'];
   }

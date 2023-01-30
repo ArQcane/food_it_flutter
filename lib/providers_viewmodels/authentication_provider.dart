@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:food_it_flutter/data/exceptions/logged_out_exception.dart';
 import 'package:food_it_flutter/domain/user/user_repository.dart';
 
 import '../data/exceptions/default_exception.dart';
@@ -15,7 +16,7 @@ class AuthenticationProvider extends ChangeNotifier{
     (() async {
       try {
         await retrieveToken();
-      } on DefaultException {
+      } on UnauthenticatedException {
         return;
       }
       await getCurrentLoggedInUser();

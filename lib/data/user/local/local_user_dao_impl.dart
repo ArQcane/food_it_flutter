@@ -1,3 +1,4 @@
+import 'package:food_it_flutter/data/exceptions/logged_out_exception.dart';
 import 'package:food_it_flutter/data/user/local/local_user_dao.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,7 +12,7 @@ class LocalUserDaoImpl implements LocalUserDao {
   @override
   Future<String> retrieveToken() async {
     var token = _preferences.getString(_userKey);
-    if (token == null) throw Exception("Not logged in.");
+    if (token == null) throw UnauthenticatedException();
     return token;
   }
 

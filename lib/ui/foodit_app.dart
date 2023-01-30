@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:food_it_flutter/ui/splash_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../providers_viewmodels/restaurant_provider.dart';
@@ -13,8 +14,9 @@ class FoodItApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Color(0xFFFFF5E4)
       ),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }

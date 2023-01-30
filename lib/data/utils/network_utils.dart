@@ -5,7 +5,7 @@ class NetworkUtils {
   NetworkUtils({required this.path});
 
   Uri createUrl({String endpoint = ""}) {
-    return Uri.https(baseUrl, "$path$endpoint");
+    return Uri.parse("$baseUrl$path$endpoint");
   }
 
   Map<String, String> createAuthorizationHeader(String token) {
