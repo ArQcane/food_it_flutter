@@ -20,7 +20,7 @@ class Review {
     idrestaurant = json['idrestaurant'];
     iduser = json['iduser'];
     review = json['review'];
-    rating = json['rating'];
+    rating = json['rating'].toDouble();
     dateposted = DateTime.parse(json['dateposted']);
   }
 

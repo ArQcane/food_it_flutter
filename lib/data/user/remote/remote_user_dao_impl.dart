@@ -66,7 +66,7 @@ class RemoteUserDaoImpl extends NetworkUtils implements RemoteUserDao {
       throw DefaultException.fromJson(jsonDecode(response.body));
     }
     var body = jsonDecode(response.body);
-    var token = body["token"];
+    var token = body["result"];
     if (token == null) {
       throw DefaultException(error: "Unknown error has occurred");
     }

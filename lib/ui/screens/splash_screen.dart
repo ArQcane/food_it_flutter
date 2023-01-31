@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
-import 'package:food_it_flutter/ui/foodit_app.dart';
+import 'package:food_it_flutter/ui/screens/login_screen.dart';
 import 'package:provider/provider.dart';
+
+import '../../data/exceptions/logged_out_exception.dart';
+import '../theme/colors.dart';
+import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -15,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   double logoLeft = -200;
   double opacity = 0;
-  late AuthenticationProvider provider;
+
 
 
   void animateItems(BuildContext context) async {
@@ -33,19 +37,32 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(duration);
     await Future.delayed(Duration(seconds: 2));
 
-    if(provider.token != null){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => HomeScreen()));
+    var authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
+    try {
+      await authProvider.retrieveToken();
+    } on UnauthenticatedException {
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 1500),
+          pageBuilder: (_, __, ___) => const LoginScreen(),
+        ),
+      );
       return;
     }
-    // TODO: To change to Auth Screen later
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => HomeScreen()));
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 1500),
+        pageBuilder: (_, __, ___) => const HomeScreen(),
+      ),
+    );
   }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => animateItems(context));
-    provider = Provider.of<AuthenticationProvider>(context, listen: false);
   }
 
   @override
@@ -60,14 +77,17 @@ class _SplashScreenState extends State<SplashScreen> {
             AnimatedPositioned(
               top: size.height / 2 - 100,
               left: logoLeft,
-              curve: Curves.fastOutSlowIn,
+              curve : Curves.fastOutSlowIn,
               duration: duration,
               child: Container(
                 width: 200,
                 height: 200,
-                child: Image.asset(
-                  "assets/foodit-website-favicon-color.png",
-                  fit: BoxFit.fill,
+                child: Hero(
+                  tag: "logo",
+                  child: Image.asset(
+                    "assets/foodit-website-favicon-color.png",
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
             ),
@@ -84,7 +104,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     style: TextStyle(
                       fontFamily: "BungeeShade",
                       fontSize: 54,
-                      color: Color(0xFFEE3E38),
+                      color: primary,
                     ),
                   ),
                 ),

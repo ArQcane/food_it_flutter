@@ -6,7 +6,7 @@ import 'package:food_it_flutter/domain/user/user_repository.dart';
 import '../data/exceptions/default_exception.dart';
 import '../domain/user/user.dart';
 
-class AuthenticationProvider extends ChangeNotifier{
+class AuthenticationProvider extends ChangeNotifier {
   final UserRepository _userRepo;
   final BuildContext _context;
   String? token;
@@ -41,9 +41,46 @@ class AuthenticationProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  void logOut() {
+  Future<void> login(String username, String password) async {
+    var resultToken = await _userRepo.login(
+      username: username,
+      password: password,
+    );
+    await _userRepo.saveToken(token: resultToken);
+    token = resultToken;
+    await getCurrentLoggedInUser();
+  }
+
+  Future<void> register(
+      String firstName,
+      String lastName,
+      String username,
+      String password,
+      String email,
+      int mobileNumber,
+      String gender,
+      String address,
+      String profilePic) async {
+    var resultToken = await _userRepo.register(
+      firstName: firstName,
+      lastName: lastName,
+      username: username,
+      password: password,
+      email: email,
+      mobileNumber: mobileNumber,
+      gender: gender,
+      address: address,
+      profilePic: profilePic,
+    );
+    await _userRepo.saveToken(token: resultToken);
+    token = resultToken;
+    await getCurrentLoggedInUser();
+  }
+
+  Future<void> logOut() async {
     token = null;
     user = null;
+    await _userRepo.removeToken();
     notifyListeners();
   }
 }
