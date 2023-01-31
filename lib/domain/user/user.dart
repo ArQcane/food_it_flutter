@@ -28,7 +28,7 @@ class User {
     last_name = json['last_name'];
     username = json['username'];
     gender = json['gender'];
-    mobile_number = json['mobile_number'];
+    mobile_number = json['mobile_number'] as int;
     email = json['email'];
     address = json['address'];
     profile_pic = json['profile_pic'];

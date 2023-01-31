@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/ui/components/action_button.dart';
-import 'package:food_it_flutter/ui/components/heading_title.dart';
+import 'package:food_it_flutter/ui/components/gradient_text.dart';
 import 'package:food_it_flutter/ui/screens/home_screen.dart';
+import 'package:food_it_flutter/ui/screens/register_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:provider/provider.dart';
 
@@ -241,8 +242,13 @@ class _LoginScreenState extends State<LoginScreen>
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
-                                onPressed: () {
-                                  //TODO: Navigate function
+                                onPressed: (){
+                                  Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      transitionDuration: const Duration(milliseconds: 1500),
+                                      pageBuilder: (_, __, ___) => const RegisterScreen(),
+                                    ),
+                                  );
                                 },
                                 child: Text("Don't Have an account yet?"),
                               ),

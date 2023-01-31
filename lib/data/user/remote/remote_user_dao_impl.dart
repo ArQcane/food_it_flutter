@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:food_it_flutter/data/user/remote/remote_user_dao.dart';
 import 'package:food_it_flutter/domain/user/user.dart';
@@ -84,7 +85,7 @@ class RemoteUserDaoImpl extends NetworkUtils implements RemoteUserDao {
       required String gender,
       required String address,
       required String profilePic}) async {
-    var response = await post(createUrl(endpoint: "/register"), body: {
+    var payloadBody = {
       "first_name": firstName,
       "last_name": lastName,
       "username": username,
@@ -94,15 +95,25 @@ class RemoteUserDaoImpl extends NetworkUtils implements RemoteUserDao {
       "email": email,
       "address": address,
       "profile_pic": profilePic
-    });
+    };
+    print(jsonEncode(payloadBody));
+    var response = await post(
+      createUrl(endpoint: "/register"),
+      body: jsonEncode(payloadBody),
+      headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+      },
+    );
+    print(response.body);
     if (response.statusCode == 400) {
       throw FieldError.fromJson(jsonDecode(response.body));
     }
     if (response.statusCode != 200) {
       throw DefaultException.fromJson(jsonDecode(response.body));
     }
+    print(response.body);
     var body = jsonDecode(response.body);
-    var token = body["token"];
+    var token = body["result"];
     if (token == null) {
       throw DefaultException(error: "Unknown error has occurred");
     }

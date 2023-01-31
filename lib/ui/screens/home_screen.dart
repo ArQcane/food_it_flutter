@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
-import 'package:food_it_flutter/ui/components/heading_title.dart';
+import 'package:food_it_flutter/ui/components/gradient_text.dart';
 import 'package:food_it_flutter/ui/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
