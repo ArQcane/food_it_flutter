@@ -3,6 +3,8 @@ import 'package:food_it_flutter/domain/favourite/favourite_repository.dart';
 import 'package:food_it_flutter/domain/restaurant/restaurant.dart';
 import 'package:food_it_flutter/domain/user/user.dart';
 
+import '../../domain/favourite/favourite.dart';
+
 class FavouriteRepositoryImpl implements FavouriteRepository{
   final RemoteFavouriteDao _dao;
   FavouriteRepositoryImpl({required RemoteFavouriteDao remoteFavouriteDao}) : _dao = remoteFavouriteDao;
@@ -18,7 +20,7 @@ class FavouriteRepositoryImpl implements FavouriteRepository{
   }
 
   @override
-  Future<List<User>> getUsersWhoFavouriteRestaurant({required String restaurantId}) {
+  Future<List<Favourite>> getUsersWhoFavouriteRestaurant({required String restaurantId}) {
     return _dao.getUsersWhoFavouriteRestaurant(restaurantId: restaurantId);
   }
 

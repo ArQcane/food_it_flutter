@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
-import 'package:food_it_flutter/ui/screens/login_screen.dart';
+import 'package:food_it_flutter/ui/screens/auth/login_screen.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/exceptions/logged_out_exception.dart';
-import '../theme/colors.dart';
-import 'home_screen.dart';
+import '../../../data/exceptions/logged_out_exception.dart';
+import '../../theme/colors.dart';
+import '../restaurant/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);

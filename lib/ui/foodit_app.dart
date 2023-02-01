@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:food_it_flutter/ui/screens/splash_screen.dart';
+import 'package:food_it_flutter/ui/screens/auth/splash_screen.dart';
 import 'package:food_it_flutter/ui/theme/theme.dart';
 import 'package:provider/provider.dart';
 

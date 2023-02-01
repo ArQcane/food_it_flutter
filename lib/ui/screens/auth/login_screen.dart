@@ -3,13 +3,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/ui/components/action_button.dart';
 import 'package:food_it_flutter/ui/components/gradient_text.dart';
-import 'package:food_it_flutter/ui/screens/home_screen.dart';
-import 'package:food_it_flutter/ui/screens/register_screen.dart';
+import 'package:food_it_flutter/ui/screens/auth/register_screen.dart';
+import 'package:food_it_flutter/ui/screens/restaurant/home_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/exceptions/default_exception.dart';
-import '../../data/exceptions/field_exception.dart';
+import '../../../data/exceptions/default_exception.dart';
+import '../../../data/exceptions/field_exception.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool animate;
