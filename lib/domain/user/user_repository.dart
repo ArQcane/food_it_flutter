@@ -1,5 +1,7 @@
 import 'package:food_it_flutter/domain/user/user.dart';
 
+import '../review/review_user.dart';
+
 abstract class UserRepository {
   Future<String> retrieveToken();
   Future<void> saveToken({required String token});

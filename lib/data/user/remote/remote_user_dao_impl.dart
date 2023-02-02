@@ -5,6 +5,7 @@ import 'package:food_it_flutter/data/user/remote/remote_user_dao.dart';
 import 'package:food_it_flutter/domain/user/user.dart';
 import 'package:http/http.dart';
 
+import '../../../domain/review/review_user.dart';
 import '../../exceptions/default_exception.dart';
 import '../../exceptions/field_exception.dart';
 import '../../exceptions/logged_out_exception.dart';
@@ -40,7 +41,7 @@ class RemoteUserDaoImpl extends NetworkUtils implements RemoteUserDao {
 
   @override
   Future<User> getUserById({required String id}) async {
-    var response = await get(createUrl(endpoint: "/id/$id"));
+    var response = await get(createUrl(endpoint: "/fullId/$id"));
     var body = jsonDecode(response.body);
     if (body == null) {
       throw DefaultException(error: "No user with id $id found");

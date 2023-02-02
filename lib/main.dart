@@ -56,7 +56,7 @@ void main() async {
           create: (context) => RestaurantProvider(context, restaurantRepo, favouriteRepo),
         ),
         ChangeNotifierProvider(
-          create: (context) => ReviewProvider(context, reviewRepo),
+          create: (context) => ReviewProvider(context, reviewRepo, userRepo),
         ),
       ],
       child: const FoodItApp(),

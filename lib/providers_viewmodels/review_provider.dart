@@ -1,21 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/domain/review/review_repository.dart';
+import 'package:food_it_flutter/domain/user/user.dart';
+import 'package:food_it_flutter/domain/user/user_repository.dart';
 
 import '../data/exceptions/default_exception.dart';
 import '../domain/review/review.dart';
+import 'authentication_provider.dart';
+
+class TransformedReview {
+  Review review;
+  User reviewUser;
+
+  TransformedReview({
+    required this.review,
+    required this.reviewUser,
+  });
+}
+
 
 class ReviewProvider extends ChangeNotifier {
   final ReviewRepository _reviewRepo;
+  final UserRepository _userRepo;
   final BuildContext _context;
-  List<Review> reviewList = [];
+  List<TransformedReview> reviewList = [];
 
-  ReviewProvider(this._context, this._reviewRepo) {
+  ReviewProvider(this._context, this._reviewRepo, this._userRepo) {
     getReviews();
   }
 
   Future<void> getReviews() async {
     try {
-      reviewList = await _reviewRepo.getAllReviews();
+      var reviews = await _reviewRepo.getAllReviews();
+      var transformedReview = reviews.map((e) async {
+        var user = await _userRepo.getUserById(
+          id: e.iduser.toString(),
+        );
+        return TransformedReview(review: e, reviewUser: user);
+      }).toList();
+      reviewList = await Future.wait(transformedReview);
       notifyListeners();
     } on DefaultException catch (e) {
       ScaffoldMessenger.of(_context).showSnackBar(
@@ -38,10 +60,14 @@ class ReviewProvider extends ChangeNotifier {
         rating: rating,
       );
       var reviewAdded = await _reviewRepo.getReviewsById(id: insertId);
+      var reviewUser = await _userRepo.getUserById(
+        id: userId.toString(),
+      );
+      var transformedReview = TransformedReview(review: reviewAdded, reviewUser: reviewUser);
       reviewList = reviewList
-        ..add(reviewAdded)
+        ..add(transformedReview)
         ..sort((a, b) {
-          return b.dateposted.compareTo(a.dateposted);
+          return b.review.dateposted.compareTo(a.review.dateposted);
         });
       notifyListeners();
     } on DefaultException catch (e) {
@@ -65,10 +91,14 @@ class ReviewProvider extends ChangeNotifier {
           idUser: userId,
           review: review,
           rating: rating);
+      var reviewUser = await _userRepo.getUserById(
+        id: userId.toString(),
+      );
+      var transformedReview = TransformedReview(review: reviewAdded, reviewUser: reviewUser);
       reviewList = reviewList
-        ..add(reviewAdded)
+        ..add(transformedReview)
         ..sort((a, b) {
-          return b.dateposted.compareTo(a.dateposted);
+          return b.review.dateposted.compareTo(a.review.dateposted);
         });
       notifyListeners();
     } on DefaultException catch (e) {
@@ -84,7 +114,7 @@ class ReviewProvider extends ChangeNotifier {
         reviewId: reviewId,
       );
       reviewList = reviewList.where((element) {
-        return element.review_id.toString() != reviewId;
+        return element.review.review_id.toString() != reviewId;
       }).toList();
       notifyListeners();
     } on DefaultException catch (e) {

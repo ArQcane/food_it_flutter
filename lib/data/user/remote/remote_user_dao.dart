@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../../../domain/review/review_user.dart';
 import '../../../domain/user/user.dart';
 
 abstract class RemoteUserDao {

@@ -149,7 +149,7 @@ class FavouriteRestaurantSection extends StatelessWidget {
               reviewsOfRestaurant: reviewProvider.reviewList
                   .where(
                     (element) =>
-                        element.idrestaurant ==
+                        element.review.idrestaurant ==
                         favouriteRestaurants[index].restaurant.restaurant_id,
                   )
                   .toList(),
@@ -226,17 +226,17 @@ class FeaturedRestaurantSection extends StatelessWidget {
     var featuredRestaurants = restaurantProvider.restaurantList
       ..sort((a, b) {
         var reviewsOfA = reviewProvider.reviewList.where((element) {
-          return element.idrestaurant == a.restaurant.restaurant_id;
+          return element.review.idrestaurant == a.restaurant.restaurant_id;
         });
         var reviewsOfB = reviewProvider.reviewList.where((element) {
-          return element.idrestaurant == b.restaurant.restaurant_id;
+          return element.review.idrestaurant == b.restaurant.restaurant_id;
         });
 
         var totalRatingOfA = reviewsOfA.fold<double>(0, (value, element) {
-          return value + element.rating;
+          return value + element.review.rating;
         });
         var totalRatingOfB = reviewsOfB.fold<double>(0, (value, element) {
-          return value + element.rating;
+          return value + element.review.rating;
         });
 
         var averageRatingOfA =
@@ -272,7 +272,7 @@ class FeaturedRestaurantSection extends StatelessWidget {
               currentUser: currentUser,
               reviewsOfRestaurant: reviewProvider.reviewList.where(
                 (element) {
-                  return element.idrestaurant ==
+                  return element.review.idrestaurant ==
                       featuredRestaurants[index].restaurant.restaurant_id;
                 },
               ).toList(),
@@ -337,7 +337,7 @@ class AllRestaurantsSection extends StatelessWidget {
                 currentUser: currentUser,
                 reviewsOfRestaurant: reviewProvider.reviewList.where(
                   (element) {
-                    return element.idrestaurant ==
+                    return element.review.idrestaurant ==
                         restaurantList[index][0].restaurant.restaurant_id;
                   },
                 ).toList(),
@@ -365,7 +365,7 @@ class AllRestaurantsSection extends StatelessWidget {
                       currentUser: currentUser,
                       reviewsOfRestaurant: reviewProvider.reviewList.where(
                         (element) {
-                          return element.idrestaurant ==
+                          return element.review.idrestaurant ==
                               restaurantList[index][1].restaurant.restaurant_id;
                         },
                       ).toList(),

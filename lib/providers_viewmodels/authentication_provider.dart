@@ -1,9 +1,13 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/data/exceptions/logged_out_exception.dart';
 import 'package:food_it_flutter/domain/user/user_repository.dart';
 
 import '../data/exceptions/default_exception.dart';
+import '../domain/review/review_user.dart';
 import '../domain/user/user.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
@@ -24,6 +28,23 @@ class AuthenticationProvider extends ChangeNotifier {
       await getCurrentLoggedInUser();
     })();
   }
+
+  Image imageFromBase64String(String base64String) {
+    return Image.memory(
+        base64Decode(base64String.replaceAll("data:image/png;base64,", "")
+        .replaceAll("data:image/jpeg;base64,", "")),
+            fit: BoxFit.fill,
+    );
+  }
+
+  Uint8List dataFromBase64String(String base64String) {
+    return base64Decode(base64String);
+  }
+
+  String base64String(Uint8List data) {
+    return base64Encode(data);
+  }
+
 
   Future<void> retrieveToken() async {
     token = await _userRepo.retrieveToken();
@@ -96,6 +117,4 @@ class AuthenticationProvider extends ChangeNotifier {
     await _userRepo.removeToken();
     notifyListeners();
   }
-
-
 }

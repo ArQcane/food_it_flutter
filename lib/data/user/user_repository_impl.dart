@@ -2,6 +2,7 @@ import 'package:food_it_flutter/data/user/remote/remote_user_dao.dart';
 import 'package:food_it_flutter/domain/user/user.dart';
 import 'package:food_it_flutter/domain/user/user_repository.dart';
 
+import '../../domain/review/review_user.dart';
 import 'local/local_user_dao.dart';
 
 class UserRepositoryImpl implements UserRepository {

@@ -1,14 +1,20 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
+import 'package:food_it_flutter/ui/components/action_button.dart';
 import 'package:food_it_flutter/ui/components/gradient_text.dart';
+import 'package:food_it_flutter/ui/components/review_card.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
+import '../../../data/exceptions/default_exception.dart';
+import '../../../data/exceptions/field_exception.dart';
 import '../../../domain/review/review.dart';
 import '../../../providers_viewmodels/restaurant_provider.dart';
 
@@ -36,9 +42,7 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
           element.restaurant.restaurant_id.toString() == widget.restaurantId,
     );
     var reviewsOfRestaurant = reviewProvider.reviewList
-        .where(
-          (e) => e.idrestaurant.toString() == widget.restaurantId,
-        )
+        .where((e) => e.review.idrestaurant.toString() == widget.restaurantId)
         .toList();
     var initialCameraPosition = const CameraPosition(
       target: LatLng(1.3610, 103.8200),
@@ -59,93 +63,121 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
     );
 
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            _parallaxToolbar(
-              restaurantProvider,
-              authProvider,
-              transformedRestaurant,
-            )
-          ];
-        },
-        body: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 10,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const GradientText(
-                  text: "Data",
-                  textStyle: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                _buildRestaurantReviewMetaData(
-                  reviewsOfRestaurant,
+        body: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                _parallaxToolbar(
+                  restaurantProvider,
+                  authProvider,
                   transformedRestaurant,
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                _userWhoFavouriteProgressbar(
-                    reviewsOfRestaurant, transformedRestaurant, authProvider),
-                const SizedBox(height: 10),
-                const GradientText(
-                  text: "Biography",
-                  textStyle: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  transformedRestaurant.restaurant.biography,
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(height: 10),
-                const GradientText(
-                  text: "Location of Restaurant",
-                  textStyle: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: primary,
-                        width: 2,
-                      ),
-                    ),
-                    child: GoogleMap(
-                      gestureRecognizers: {
-                        Factory<OneSequenceGestureRecognizer>(() {
-                          return EagerGestureRecognizer();
-                        }),
-                      },
-                      initialCameraPosition: initialCameraPosition,
-                      markers: Set<Marker>.of(_locationMarker),
-                    ),
-                  ),
                 )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+              ];
+            },
+            body: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const GradientText(
+                        text: "Data",
+                        textStyle: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      _buildRestaurantReviewMetaData(
+                        reviewsOfRestaurant,
+                        transformedRestaurant,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      _userWhoFavouriteProgressbar(reviewsOfRestaurant,
+                          transformedRestaurant, authProvider),
+                      const SizedBox(height: 10),
+                      const GradientText(
+                        text: "Biography",
+                        textStyle: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        transformedRestaurant.restaurant.biography,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 10),
+                      const GradientText(
+                        text: "Location of Restaurant",
+                        textStyle: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      AspectRatio(
+                        aspectRatio: 1,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: primary,
+                              width: 2,
+                            ),
+                          ),
+                          child: GoogleMap(
+                            gestureRecognizers: {
+                              Factory<OneSequenceGestureRecognizer>(() {
+                                return EagerGestureRecognizer();
+                              }),
+                            },
+                            initialCameraPosition: initialCameraPosition,
+                            markers: Set<Marker>.of(_locationMarker),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ReviewForm(restaurantId: widget.restaurantId),
+                      const SizedBox(height: 10),
+                      if (reviewsOfRestaurant.isNotEmpty)
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: List.generate(
+                                min(3, reviewsOfRestaurant.length), (index) {
+                              return Row(
+                                children: [
+                                  ReviewCard(
+                                    review: reviewsOfRestaurant[index],
+                                    width: reviewsOfRestaurant.length == 1
+                                        ? MediaQuery.of(context).size.width - 32
+                                        : MediaQuery.of(context).size.width -
+                                            56,
+                                  ),
+                                  SizedBox(
+                                    width: reviewsOfRestaurant.length == 1 ||
+                                            index == 2 ||
+                                            index ==
+                                                reviewsOfRestaurant.length - 1
+                                        ? 0
+                                        : 12,
+                                  ),
+                                ],
+                              );
+                            }),
+                          ),
+                        ),
+                    ]),
+              ),
+            )));
   }
 
-  Material _buildRestaurantReviewMetaData(List<Review> reviewsOfRestaurant,
+  Material _buildRestaurantReviewMetaData(List<TransformedReview> reviewsOfRestaurant,
       TransformedRestaurant transformedRestaurant) {
     return Material(
       elevation: 4,
@@ -210,7 +242,7 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
   }
 
   Material _userWhoFavouriteProgressbar(
-      List<Review> reviewsOfRestaurant,
+      List<TransformedReview> reviewsOfRestaurant,
       TransformedRestaurant transformedRestaurant,
       AuthenticationProvider authProvider) {
     return Material(
@@ -261,11 +293,11 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
     );
   }
 
-  double _getAvgRating(List<Review> reviewList) {
+  double _getAvgRating(List<TransformedReview> reviewList) {
     if (reviewList.isEmpty) return 0;
     var totalRating = reviewList.fold<double>(
       0,
-      (previousValue, element) => previousValue + element.rating,
+      (previousValue, element) => previousValue + element.review.rating,
     );
     return totalRating / reviewList.length.toDouble();
   }
@@ -302,7 +334,7 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
 
       return SliverAppBar(
         expandedHeight: width,
-        surfaceTintColor:  Colors.white,
+        surfaceTintColor: Colors.white,
         floating: false,
         pinned: true,
         leading: Padding(
@@ -310,7 +342,7 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: materialColor.withOpacity(1-percent),
+              color: materialColor.withOpacity(1 - percent),
             ),
             child: IconButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -319,14 +351,13 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
             ),
           ),
         ),
-        
         actions: [
           Padding(
             padding: EdgeInsets.all(8),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: materialColor.withOpacity(1-percent),
+                color: materialColor.withOpacity(1 - percent),
               ),
               child: IconButton(
                 onPressed: () {
@@ -338,7 +369,9 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                 },
                 splashRadius: 20,
                 icon: Icon(
-                  isFavoriteByCurrentUser ? Icons.favorite : Icons.favorite_border,
+                  isFavoriteByCurrentUser
+                      ? Icons.favorite
+                      : Icons.favorite_border,
                   color: color,
                 ),
               ),
@@ -350,30 +383,32 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
             start: startPadding,
             bottom: 16,
           ),
-          title: percent >= 0 && percent <= 0.7 ? Material(
-            elevation: 4,
-            color: materialColor.withOpacity(1 - percent),
-            animationDuration: Duration(milliseconds: 1000),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(10),
-              ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(5),
-              child: Text(
-                transformedRestaurant.restaurant.restaurant_name,
-                style: TextStyle(
-                  color: color,
+          title: percent >= 0 && percent <= 0.7
+              ? Material(
+                  elevation: 4,
+                  color: materialColor.withOpacity(1 - percent),
+                  animationDuration: Duration(milliseconds: 1000),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Text(
+                      transformedRestaurant.restaurant.restaurant_name,
+                      style: TextStyle(
+                        color: color,
+                      ),
+                    ),
+                  ),
+                )
+              : Text(
+                  transformedRestaurant.restaurant.restaurant_name,
+                  style: TextStyle(
+                    color: color,
+                  ),
                 ),
-              ),
-            ),
-          ) : Text(
-            transformedRestaurant.restaurant.restaurant_name,
-            style: TextStyle(
-              color: color,
-            ),
-          ),
           background: Image.network(
             transformedRestaurant.restaurant.restaurant_logo,
             fit: BoxFit.cover,
@@ -381,5 +416,192 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
         ),
       );
     });
+  }
+}
+
+class ReviewForm extends StatefulWidget {
+  final String restaurantId;
+
+  const ReviewForm({
+    Key? key,
+    required this.restaurantId,
+  }) : super(key: key);
+
+  @override
+  State<ReviewForm> createState() => _ReviewFormState();
+}
+
+class _ReviewFormState extends State<ReviewForm> {
+  final _formKey = GlobalKey<FormState>();
+  String review = "";
+  int rating = 0;
+  String? reviewError;
+  String? ratingError;
+  bool isLoading = false;
+
+  bool _validateRating() {
+    if (rating != 0) return true;
+    setState(() {
+      ratingError = "Rating required!";
+    });
+    return false;
+  }
+
+  void submit() async {
+    FocusScope.of(context).unfocus();
+    var isReviewValid = _formKey.currentState!.validate();
+    var isRatingValid = _validateRating();
+    if (!isReviewValid || !isRatingValid) return;
+    _formKey.currentState!.save();
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      var reviewProvider = Provider.of<ReviewProvider>(
+        context,
+        listen: false,
+      );
+      var user = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      ).user!;
+      await reviewProvider.createReview(
+        user.user_id.toString(),
+        widget.restaurantId,
+        review,
+        rating,
+      );
+    } on FieldException catch (e) {
+      var reviewError = e.fieldErrors.where(
+        (element) => element.field == "review",
+      );
+      var ratingError = e.fieldErrors.where(
+        (element) => element.field == "rating",
+      );
+      if (reviewError.isNotEmpty) {
+        setState(() {
+          this.reviewError = reviewError.first.error;
+        });
+      }
+      if (ratingError.isNotEmpty) {
+        setState(() {
+          this.ratingError = ratingError.first.error;
+        });
+      }
+      return;
+    } on DefaultException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.error)),
+      );
+      return;
+    } finally {
+      _formKey.currentState!.reset();
+      setState(() {
+        isLoading = false;
+        review = "";
+        rating = 0;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextFormField(
+            decoration: InputDecoration(
+              labelText: "Review",
+              border: const OutlineInputBorder(),
+              errorText: reviewError,
+            ),
+            onChanged: (_) {
+              if (reviewError == null) return;
+              setState(() {
+                reviewError = null;
+              });
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Review required!";
+              }
+              return null;
+            },
+            onSaved: (value) {
+              setState(() {
+                review = value!;
+              });
+            },
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              ShaderMask(
+                blendMode: BlendMode.srcIn,
+                shaderCallback: (rect) {
+                  return LinearGradient(
+                    colors: ratingError != null
+                        ? [Colors.red, Colors.red]
+                        : [primaryAccent, primary],
+                  ).createShader(
+                    Rect.fromLTRB(0, 0, rect.width, rect.height),
+                  );
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(
+                    5,
+                    (index) {
+                      return Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              FocusScope.of(context).unfocus();
+                              setState(() {
+                                ratingError = null;
+                                if (rating == index + 1 && rating != 1) {
+                                  rating--;
+                                  return;
+                                }
+                                rating = index + 1;
+                              });
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            splashRadius: 20,
+                            icon: Icon(
+                              rating >= index + 1
+                                  ? Icons.star
+                                  : Icons.star_border_outlined,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ActionButton(
+                  onClick: submit,
+                  isLoading: isLoading,
+                  text: "Submit",
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          if (ratingError != null)
+            Text(
+              ratingError!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+        ],
+      ),
+    );
   }
 }

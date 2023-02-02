@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/domain/review/review.dart';
+import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
 import 'package:food_it_flutter/ui/screens/restaurant/specific_restaurant_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 
@@ -10,7 +11,7 @@ import '../../providers_viewmodels/restaurant_provider.dart';
 
 class RestaurantCard extends StatelessWidget {
   final TransformedRestaurant transformedRestaurant;
-  final List<Review> reviewsOfRestaurant;
+  final List<TransformedReview> reviewsOfRestaurant;
   final User? currentUser;
   final void Function(
     bool toAddToFav,
@@ -28,7 +29,7 @@ class RestaurantCard extends StatelessWidget {
   double get averageRating {
     if (reviewsOfRestaurant.isEmpty) return 0;
     var totalRating = reviewsOfRestaurant.fold<double>(
-        0, (previousValue, element) => previousValue + element.rating);
+        0, (previousValue, element) => previousValue + element.review.rating);
     return totalRating / reviewsOfRestaurant.length;
   }
 
