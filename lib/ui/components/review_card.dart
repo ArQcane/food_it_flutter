@@ -12,11 +12,15 @@ import '../theme/colors.dart';
 class ReviewCard extends StatelessWidget {
   final TransformedReview review;
   final double width;
+  final void Function() editReview;
+  final void Function() deleteReview;
 
   const ReviewCard({
     Key? key,
     required this.review,
     required this.width,
+    required this.editReview,
+    required this.deleteReview,
   }) : super(key: key);
 
   @override
@@ -76,10 +80,24 @@ class ReviewCard extends StatelessWidget {
                     ],
                   ),
                   if (shouldShowEditBtn)
-                    IconButton(
-                      onPressed: () {}, // TODO: Show edit and delete options
-                      splashRadius: 20,
+                    PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert),
+                      onSelected: (value) {
+                        if (value == "edit") {
+                          return editReview();
+                        }
+                        deleteReview();
+                      },
+                      itemBuilder: (_) => [
+                        const PopupMenuItem(
+                          child: Text("Edit Review"),
+                          value: "edit",
+                        ),
+                        const PopupMenuItem(
+                          child: Text("Delete Review"),
+                          value: "delete",
+                        ),
+                      ],
                     )
                 ],
               ),

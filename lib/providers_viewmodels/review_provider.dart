@@ -46,6 +46,11 @@ class ReviewProvider extends ChangeNotifier {
     }
   }
 
+  Future<Review> getReviewById(String id) async {
+    var review = await _reviewRepo.getReviewsById(id: id);
+    return review;
+  }
+
   Future<void> createReview(
     String userId,
     String restaurantId,
@@ -82,21 +87,24 @@ class ReviewProvider extends ChangeNotifier {
     String restaurantId,
     String reviewId,
     String review,
-    int rating,
+    double rating,
   ) async {
     try {
-      var reviewAdded = await _reviewRepo.updateReview(
+      var reviewUpdated = await _reviewRepo.updateReview(
           reviewId: reviewId,
           idRestaurant: restaurantId,
           idUser: userId,
           review: review,
-          rating: rating);
+          rating: rating.toInt());
+      print("passes");
       var reviewUser = await _userRepo.getUserById(
         id: userId.toString(),
       );
-      var transformedReview = TransformedReview(review: reviewAdded, reviewUser: reviewUser);
-      reviewList = reviewList
-        ..add(transformedReview)
+      var transformedReview = TransformedReview(review: reviewUpdated, reviewUser: reviewUser);
+      reviewList = reviewList.map((e) {
+        if (e.review.review_id.toString() != reviewId) return e;
+        return transformedReview;
+      }).toList()
         ..sort((a, b) {
           return b.review.dateposted.compareTo(a.review.dateposted);
         });

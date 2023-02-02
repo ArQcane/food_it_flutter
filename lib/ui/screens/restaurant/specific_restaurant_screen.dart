@@ -6,8 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
 import 'package:food_it_flutter/ui/components/action_button.dart';
+import 'package:food_it_flutter/ui/components/add_review_form.dart';
+import 'package:food_it_flutter/ui/components/edit_comment_dialog.dart';
 import 'package:food_it_flutter/ui/components/gradient_text.dart';
 import 'package:food_it_flutter/ui/components/review_card.dart';
+import 'package:food_it_flutter/ui/components/review_tab_grphs.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -142,42 +145,115 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      ReviewForm(restaurantId: widget.restaurantId),
+                      AddReviewForm(restaurantId: widget.restaurantId),
                       const SizedBox(height: 10),
-                      if (reviewsOfRestaurant.isNotEmpty)
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: List.generate(
-                                min(3, reviewsOfRestaurant.length), (index) {
-                              return Row(
-                                children: [
-                                  ReviewCard(
-                                    review: reviewsOfRestaurant[index],
-                                    width: reviewsOfRestaurant.length == 1
-                                        ? MediaQuery.of(context).size.width - 32
-                                        : MediaQuery.of(context).size.width -
-                                            56,
+                      AnimatedCrossFade(
+                        crossFadeState: reviewsOfRestaurant.isNotEmpty
+                            ? CrossFadeState.showFirst
+                            : CrossFadeState.showSecond,
+                        duration: Duration(
+                          milliseconds: reviewsOfRestaurant.isEmpty ? 0 : 300,
+                        ),
+                        firstChild: Column(
+                          children: [
+                            ReviewTabGraphs(
+                              reviewsOfRestaurant: reviewsOfRestaurant,
+                            ),
+                            const SizedBox(height: 10),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: List.generate(
+                                    min(3, reviewsOfRestaurant.length),
+                                    (index) {
+                                  return Row(
+                                    children: [
+                                      ReviewCard(
+                                        review: reviewsOfRestaurant[index],
+                                        width: reviewsOfRestaurant.length == 1
+                                            ? MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                32
+                                            : MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                56,
+                                        editReview: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => EditReviewDialog(
+                                              reviewObj: reviewsOfRestaurant[index],
+                                            ),
+                                          );
+                                        },
+                                        deleteReview: () {
+                                          reviewProvider.deleteReview(
+                                            reviewsOfRestaurant[index].review.review_id.toString(),
+                                          );
+                                        },
+                                      ),
+                                      SizedBox(
+                                        width: reviewsOfRestaurant.length ==
+                                                    1 ||
+                                                index == 2 ||
+                                                index ==
+                                                    reviewsOfRestaurant.length -
+                                                        1
+                                            ? 0
+                                            : 12,
+                                      ),
+                                    ],
+                                  );
+                                }),
+                              ),
+                            ),
+                          ],
+                        ),
+                        secondChild: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            children: [
+                              ShaderMask(
+                                blendMode: BlendMode.srcIn,
+                                shaderCallback: (bounds) =>
+                                    const LinearGradient(
+                                  colors: [primaryAccent, primary],
+                                ).createShader(
+                                  Rect.fromLTWH(
+                                    0,
+                                    0,
+                                    bounds.width,
+                                    bounds.height,
                                   ),
-                                  SizedBox(
-                                    width: reviewsOfRestaurant.length == 1 ||
-                                            index == 2 ||
-                                            index ==
-                                                reviewsOfRestaurant.length - 1
-                                        ? 0
-                                        : 12,
-                                  ),
-                                ],
-                              );
-                            }),
+                                ),
+                                child: const Icon(Icons.insert_comment_outlined, size: 150),
+                              ),
+                              const Text(
+                                "No reviews yet",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const Text(
+                                "Add a review to be \nthe first review on this restaurant!",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                      ),
                     ]),
               ),
             )));
   }
 
-  Material _buildRestaurantReviewMetaData(List<TransformedReview> reviewsOfRestaurant,
+  Material _buildRestaurantReviewMetaData(
+      List<TransformedReview> reviewsOfRestaurant,
       TransformedRestaurant transformedRestaurant) {
     return Material(
       elevation: 4,
@@ -419,189 +495,3 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
   }
 }
 
-class ReviewForm extends StatefulWidget {
-  final String restaurantId;
-
-  const ReviewForm({
-    Key? key,
-    required this.restaurantId,
-  }) : super(key: key);
-
-  @override
-  State<ReviewForm> createState() => _ReviewFormState();
-}
-
-class _ReviewFormState extends State<ReviewForm> {
-  final _formKey = GlobalKey<FormState>();
-  String review = "";
-  int rating = 0;
-  String? reviewError;
-  String? ratingError;
-  bool isLoading = false;
-
-  bool _validateRating() {
-    if (rating != 0) return true;
-    setState(() {
-      ratingError = "Rating required!";
-    });
-    return false;
-  }
-
-  void submit() async {
-    FocusScope.of(context).unfocus();
-    var isReviewValid = _formKey.currentState!.validate();
-    var isRatingValid = _validateRating();
-    if (!isReviewValid || !isRatingValid) return;
-    _formKey.currentState!.save();
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      var reviewProvider = Provider.of<ReviewProvider>(
-        context,
-        listen: false,
-      );
-      var user = Provider.of<AuthenticationProvider>(
-        context,
-        listen: false,
-      ).user!;
-      await reviewProvider.createReview(
-        user.user_id.toString(),
-        widget.restaurantId,
-        review,
-        rating,
-      );
-    } on FieldException catch (e) {
-      var reviewError = e.fieldErrors.where(
-        (element) => element.field == "review",
-      );
-      var ratingError = e.fieldErrors.where(
-        (element) => element.field == "rating",
-      );
-      if (reviewError.isNotEmpty) {
-        setState(() {
-          this.reviewError = reviewError.first.error;
-        });
-      }
-      if (ratingError.isNotEmpty) {
-        setState(() {
-          this.ratingError = ratingError.first.error;
-        });
-      }
-      return;
-    } on DefaultException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.error)),
-      );
-      return;
-    } finally {
-      _formKey.currentState!.reset();
-      setState(() {
-        isLoading = false;
-        review = "";
-        rating = 0;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextFormField(
-            decoration: InputDecoration(
-              labelText: "Review",
-              border: const OutlineInputBorder(),
-              errorText: reviewError,
-            ),
-            onChanged: (_) {
-              if (reviewError == null) return;
-              setState(() {
-                reviewError = null;
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Review required!";
-              }
-              return null;
-            },
-            onSaved: (value) {
-              setState(() {
-                review = value!;
-              });
-            },
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              ShaderMask(
-                blendMode: BlendMode.srcIn,
-                shaderCallback: (rect) {
-                  return LinearGradient(
-                    colors: ratingError != null
-                        ? [Colors.red, Colors.red]
-                        : [primaryAccent, primary],
-                  ).createShader(
-                    Rect.fromLTRB(0, 0, rect.width, rect.height),
-                  );
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(
-                    5,
-                    (index) {
-                      return Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              FocusScope.of(context).unfocus();
-                              setState(() {
-                                ratingError = null;
-                                if (rating == index + 1 && rating != 1) {
-                                  rating--;
-                                  return;
-                                }
-                                rating = index + 1;
-                              });
-                            },
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            splashRadius: 20,
-                            icon: Icon(
-                              rating >= index + 1
-                                  ? Icons.star
-                                  : Icons.star_border_outlined,
-                            ),
-                          ),
-                          const SizedBox(width: 5),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ActionButton(
-                  onClick: submit,
-                  isLoading: isLoading,
-                  text: "Submit",
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 5),
-          if (ratingError != null)
-            Text(
-              ratingError!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-        ],
-      ),
-    );
-  }
-}

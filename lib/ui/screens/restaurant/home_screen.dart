@@ -49,7 +49,10 @@ class HomeScreen extends StatelessWidget {
               child: const CircularProgressIndicator(),
             )
           : RefreshIndicator(
-              onRefresh: () => restaurantProvider.getRestaurants(),
+              onRefresh: () async {
+                restaurantProvider.getRestaurants();
+                reviewProvider.getReviews();
+              },
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(5),
                 child: Column(

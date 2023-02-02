@@ -103,7 +103,7 @@ class RemoteReviewDaoImpl extends NetworkUtils implements RemoteReviewDao{
       length += 1;
     }
     if (rating != null) {
-      requestBody["rating"] = rating;
+      requestBody["rating"] = rating.toString();
       length += 1;
     }
     requestBody["idrestaurant"] = idRestaurant;
@@ -114,7 +114,7 @@ class RemoteReviewDaoImpl extends NetworkUtils implements RemoteReviewDao{
       );
     }
     var response = await put(
-      createUrl(endpoint: "/updatereview/$reviewId"),
+      createUrl(endpoint: "/updatereviewflutter/$reviewId"),
       body: requestBody,
     );
     if (response.statusCode == 400) {
