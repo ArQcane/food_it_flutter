@@ -39,6 +39,8 @@ dependencies:
   http: ^0.13.5
   shared_preferences: ^2.0.17
   flutter_svg: ^1.0.0
+  google_maps_flutter: ^2.1.8
+  percent_indicator: ^4.0.1
 
 dev_dependencies:
   flutter_test:

@@ -11,9 +11,11 @@ class AuthenticationProvider extends ChangeNotifier {
   final BuildContext _context;
   String? token;
   User? user;
+  List<User> allUsersInDB = [];
 
   AuthenticationProvider(this._context, this._userRepo) {
     (() async {
+      await getAllUsersInDatabase();
       try {
         await retrieveToken();
       } on UnauthenticatedException {
@@ -39,6 +41,17 @@ class AuthenticationProvider extends ChangeNotifier {
     }
     user = await _userRepo.validateToken(token: token!);
     notifyListeners();
+  }
+
+  Future<void> getAllUsersInDatabase() async {
+    try {
+      allUsersInDB = await _userRepo.getAllUsers();
+      notifyListeners();
+    } on DefaultException catch (e) {
+      ScaffoldMessenger.of(_context).showSnackBar(
+        SnackBar(content: Text(e.error)),
+      );
+    }
   }
 
   Future<void> login(String username, String password) async {
@@ -83,4 +96,6 @@ class AuthenticationProvider extends ChangeNotifier {
     await _userRepo.removeToken();
     notifyListeners();
   }
+
+
 }

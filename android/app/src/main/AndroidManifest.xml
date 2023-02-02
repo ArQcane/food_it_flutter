@@ -2,8 +2,6 @@
     package="com.example.food_it_flutter">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <meta-data android:name="com.google.android.geo.API_KEY"
-        android:value="${MAPS_API_KEY}" />
    <application
         android:label="food_it_flutter"
         android:name="${applicationName}"
@@ -34,5 +32,7 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+       <meta-data android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyDzMNXkQ3CUt7yqy0HbVt685r9YhxGRFEM" />
     </application>
 </manifest>
