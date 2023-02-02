@@ -6,7 +6,7 @@ abstract class RemoteReviewDao{
   Future<List<Review>> getReviewsByUser({required String userId});
   Future<List<Review>> getReviewsByRestaurant({required String restaurantId});
   Future<int> getTotalReviewsByUser({required String userId});
-  Future<String> createReview({
+  Future<int> createReview({
     required String userId,
     required String restaurantId,
     required String review,

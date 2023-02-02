@@ -10,7 +10,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
       : _dao = remoteCommentDao;
 
   @override
-  Future<String> createReview(
+  Future<int> createReview(
       {required String userId, required String restaurantId, required String review, required int rating}) {
     return _dao.createReview(
         userId: userId,

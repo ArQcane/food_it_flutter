@@ -12,14 +12,14 @@ class RemoteReviewDaoImpl extends NetworkUtils implements RemoteReviewDao{
   RemoteReviewDaoImpl() : super(path: "/reviews");
 
   @override
-  Future<String> createReview({required String userId, required String restaurantId, required String review, required int rating}) async {
+  Future<int> createReview({required String userId, required String restaurantId, required String review, required int rating}) async {
     var response = await post(
       createUrl(endpoint: "/addreview"),
       body: {
         "idrestaurant": restaurantId,
         "iduser": userId,
         "review": review,
-        "rating": rating,
+        "rating": rating.toString(),
       },
     );
     var body = jsonDecode(response.body);

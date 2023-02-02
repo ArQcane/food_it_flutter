@@ -59,7 +59,7 @@ class ReviewProvider extends ChangeNotifier {
         review: review,
         rating: rating,
       );
-      var reviewAdded = await _reviewRepo.getReviewsById(id: insertId);
+      var reviewAdded = await _reviewRepo.getReviewsById(id: insertId.toString());
       var reviewUser = await _userRepo.getUserById(
         id: userId.toString(),
       );
