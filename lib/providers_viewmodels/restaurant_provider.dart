@@ -51,6 +51,7 @@ class RestaurantProvider extends ChangeNotifier {
         );
       }).toList();
       restaurantList = await Future.wait(transformedRestaurants);
+      await Future.delayed(Duration(milliseconds: 1000));
       isLoading = false;
       notifyListeners();
     } on DefaultException catch (e) {

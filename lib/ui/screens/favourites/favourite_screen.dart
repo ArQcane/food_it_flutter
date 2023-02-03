@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../components/extras/rive_favourites_animation.dart';
+
 class FavouriteScreen extends StatefulWidget {
   const FavouriteScreen({Key? key}) : super(key: key);
 
@@ -10,10 +12,6 @@ class FavouriteScreen extends StatefulWidget {
 class _FavouriteScreenState extends State<FavouriteScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Favourite Screen'),
-      ),
-    );
+    return const PlayOneShotAnimation();
   }
 }

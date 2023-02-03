@@ -37,7 +37,20 @@ class SpecificRestaurantScreen extends StatefulWidget {
       _SpecificRestaurantScreenState();
 }
 
+
+
 class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
+  bool _showGoogleMap = false;
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      setState(() {
+        _showGoogleMap = true;
+      });
+    });
+    return;
+  }
   @override
   Widget build(BuildContext context) {
     var restaurantProvider = Provider.of<RestaurantProvider>(context);
@@ -68,229 +81,246 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
       ),
     );
 
+
+
+
     return Scaffold(
-        body: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
-                _parallaxToolbar(
-                  restaurantProvider,
-                  authProvider,
-                  transformedRestaurant,
-                )
-              ];
-            },
-            body: SingleChildScrollView(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 5),
-                      _buildRestaurantReviewMetaData(
-                        reviewsOfRestaurant,
-                        transformedRestaurant,
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      _userWhoFavouriteProgressbar(reviewsOfRestaurant,
-                          transformedRestaurant, authProvider),
-                      const SizedBox(height: 10),
-                      const GradientText(
-                        text: "Location of Restaurant",
-                        textStyle: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      AspectRatio(
-                        aspectRatio: 1,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: primary,
-                              width: 2,
-                            ),
-                          ),
-                          child: GoogleMap(
-                            gestureRecognizers: {
-                              Factory<OneSequenceGestureRecognizer>(() {
-                                return EagerGestureRecognizer();
-                              }),
-                            },
-                            initialCameraPosition: initialCameraPosition,
-                            markers: Set<Marker>.of(_locationMarker),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: restaurantProvider.isLoading
+            ? Container(
+                alignment: Alignment.center,
+                child: const CircularProgressIndicator(),
+              )
+            : NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return [
+                    _parallaxToolbar(
+                      restaurantProvider,
+                      authProvider,
+                      transformedRestaurant,
+                    )
+                  ];
+                },
+                body: SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SizedBox(height: 5),
+                          _buildRestaurantReviewMetaData(
+                            reviewsOfRestaurant,
+                            transformedRestaurant,
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          _userWhoFavouriteProgressbar(reviewsOfRestaurant,
+                              transformedRestaurant, authProvider),
+                          const SizedBox(height: 10),
                           const GradientText(
-                            text: "Reviews",
+                            text: "Location of Restaurant",
                             textStyle: TextStyle(
-                              fontSize: 30,
+                              fontSize: 28,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          if (reviewsOfRestaurant.isNotEmpty)
-                            ActionButton(
-                                onClick: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => AllReviewsScreen(
-                                          restaurantId: widget.restaurantId,
-                                        ),
-                                      ),
-                                    ),
-                                text: "See all")
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      AddReviewForm(restaurantId: widget.restaurantId),
-                      const SizedBox(height: 10),
-                      AnimatedCrossFade(
-                        crossFadeState: reviewsOfRestaurant.isNotEmpty
-                            ? CrossFadeState.showFirst
-                            : CrossFadeState.showSecond,
-                        duration: Duration(
-                          milliseconds: reviewsOfRestaurant.isEmpty ? 0 : 300,
-                        ),
-                        firstChild: Column(
-                          children: [
-                            ReviewTabGraphs(
-                              reviewsOfRestaurant: reviewsOfRestaurant,
-                            ),
-                            const SizedBox(height: 10),
-                            const Material(
-                              elevation: 3,
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                child:
-                                    GradientText(text: "3 Most Recent Reviews"),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: List.generate(
-                                    min(3, reviewsOfRestaurant.length),
-                                    (index) {
-                                  return Row(
-                                    children: [
-                                      ReviewCard(
-                                        review: reviewsOfRestaurant[index],
-                                        width: reviewsOfRestaurant.length == 1
-                                            ? MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                32
-                                            : MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                56,
-                                        editReview: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (_) => EditReviewDialog(
-                                              reviewObj:
-                                                  reviewsOfRestaurant[index],
-                                            ),
-                                          );
-                                        },
-                                        deleteReview: () {
-                                          reviewProvider.deleteReview(
-                                            reviewsOfRestaurant[index]
-                                                .review
-                                                .review_id
-                                                .toString(),
-                                          );
-                                        },
-                                      ),
-                                      SizedBox(
-                                        width: reviewsOfRestaurant.length ==
-                                                    1 ||
-                                                index == 2 ||
-                                                index ==
-                                                    reviewsOfRestaurant.length -
-                                                        1
-                                            ? 0
-                                            : 12,
-                                      ),
-                                    ],
-                                  );
-                                }),
-                              ),
-                            ),
-                          ],
-                        ),
-                        secondChild: SizedBox(
-                          width: double.infinity,
-                          child: Column(
-                            children: [
-                              ShaderMask(
-                                blendMode: BlendMode.srcIn,
-                                shaderCallback: (bounds) =>
-                                    const LinearGradient(
-                                  colors: [primaryAccent, primary],
-                                ).createShader(
-                                  Rect.fromLTWH(
-                                    0,
-                                    0,
-                                    bounds.width,
-                                    bounds.height,
-                                  ),
+                          const SizedBox(height: 5),
+                          if(_showGoogleMap)
+                          AspectRatio(
+                            aspectRatio: 1,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: primary,
+                                  width: 2,
                                 ),
-                                child: const Icon(Icons.insert_comment_outlined,
-                                    size: 150),
                               ),
-                              const Text(
-                                "No reviews yet",
-                                style: TextStyle(
-                                  fontSize: 20,
+                              child: GoogleMap(
+                                gestureRecognizers: {
+                                  Factory<OneSequenceGestureRecognizer>(() {
+                                    return EagerGestureRecognizer();
+                                  }),
+                                },
+                                initialCameraPosition: initialCameraPosition,
+                                markers: Set<Marker>.of(_locationMarker),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const GradientText(
+                                text: "Reviews",
+                                textStyle: TextStyle(
+                                  fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const Text(
-                                "Add a review to be \nthe first review on this restaurant!",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                ),
-                              ),
+                              if (reviewsOfRestaurant.isNotEmpty)
+                                ActionButton(
+                                    onClick: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => AllReviewsScreen(
+                                              restaurantId: widget.restaurantId,
+                                            ),
+                                          ),
+                                        ),
+                                    text: "See all")
                             ],
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const GradientText(
-                        text: "Biography",
-                        textStyle: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        transformedRestaurant.restaurant.biography,
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ]),
-              ),
-            )));
+                          const SizedBox(height: 10),
+                          AddReviewForm(restaurantId: widget.restaurantId),
+                          const SizedBox(height: 10),
+                          AnimatedCrossFade(
+                            crossFadeState: reviewsOfRestaurant.isNotEmpty
+                                ? CrossFadeState.showFirst
+                                : CrossFadeState.showSecond,
+                            duration: Duration(
+                              milliseconds:
+                                  reviewsOfRestaurant.isEmpty ? 0 : 300,
+                            ),
+                            firstChild: Column(
+                              children: [
+                                ReviewTabGraphs(
+                                  reviewsOfRestaurant: reviewsOfRestaurant,
+                                ),
+                                const SizedBox(height: 10),
+                                const Material(
+                                  elevation: 3,
+                                  color: Colors.white,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 5),
+                                    child: GradientText(
+                                        text: "3 Most Recent Reviews"),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: List.generate(
+                                        min(3, reviewsOfRestaurant.length),
+                                        (index) {
+                                      return Row(
+                                        children: [
+                                          ReviewCard(
+                                            review: reviewsOfRestaurant[index],
+                                            width:
+                                                reviewsOfRestaurant.length == 1
+                                                    ? MediaQuery.of(context)
+                                                            .size
+                                                            .width -
+                                                        32
+                                                    : MediaQuery.of(context)
+                                                            .size
+                                                            .width -
+                                                        56,
+                                            editReview: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (_) =>
+                                                    EditReviewDialog(
+                                                  reviewObj:
+                                                      reviewsOfRestaurant[
+                                                          index],
+                                                ),
+                                              );
+                                            },
+                                            deleteReview: () {
+                                              reviewProvider.deleteReview(
+                                                reviewsOfRestaurant[index]
+                                                    .review
+                                                    .review_id
+                                                    .toString(),
+                                              );
+                                            },
+                                          ),
+                                          SizedBox(
+                                            width: reviewsOfRestaurant.length ==
+                                                        1 ||
+                                                    index == 2 ||
+                                                    index ==
+                                                        reviewsOfRestaurant
+                                                                .length -
+                                                            1
+                                                ? 0
+                                                : 12,
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            secondChild: SizedBox(
+                              width: double.infinity,
+                              child: Column(
+                                children: [
+                                  ShaderMask(
+                                    blendMode: BlendMode.srcIn,
+                                    shaderCallback: (bounds) =>
+                                        const LinearGradient(
+                                      colors: [primaryAccent, primary],
+                                    ).createShader(
+                                      Rect.fromLTWH(
+                                        0,
+                                        0,
+                                        bounds.width,
+                                        bounds.height,
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                        Icons.insert_comment_outlined,
+                                        size: 150),
+                                  ),
+                                  const Text(
+                                    "No reviews yet",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "Add a review to be \nthe first review on this restaurant!",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const GradientText(
+                            text: "Biography",
+                            textStyle: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            transformedRestaurant.restaurant.biography,
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ]),
+                  ),
+                )));
   }
+
+
 
   Material _buildRestaurantReviewMetaData(
       List<TransformedReview> reviewsOfRestaurant,

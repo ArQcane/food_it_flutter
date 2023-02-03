@@ -5,6 +5,7 @@ import 'package:food_it_flutter/ui/screens/auth/register_screen.dart';
 import 'package:food_it_flutter/ui/screens/restaurant/home_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:provider/provider.dart';
+import 'package:rive/rive.dart';
 
 import '../../../data/exceptions/default_exception.dart';
 import '../../../data/exceptions/field_exception.dart';
@@ -26,6 +27,37 @@ class _LoginScreenState extends State<LoginScreen>
   AnimationController? _controller;
   Animation<double>? _animation;
 
+  late RiveAnimationController _btnAnimationController;
+
+  bool isShowSignInDialog = false;
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool isShowLoading = false;
+  bool isShowConfetti = false;
+  late SMITrigger error;
+  late SMITrigger success;
+  late SMITrigger reset;
+
+  late SMITrigger confetti;
+
+  void _onCheckRiveInit(Artboard artboard) {
+    StateMachineController? controller =
+        StateMachineController.fromArtboard(artboard, 'State Machine 1');
+
+    artboard.addController(controller!);
+    error = controller.findInput<bool>('Error') as SMITrigger;
+    success = controller.findInput<bool>('Check') as SMITrigger;
+    reset = controller.findInput<bool>('Reset') as SMITrigger;
+  }
+
+  void _onConfettiRiveInit(Artboard artboard) {
+    StateMachineController? controller =
+        StateMachineController.fromArtboard(artboard, "State Machine 1");
+    artboard.addController(controller!);
+
+    confetti = controller.findInput<bool>("Trigger explosion") as SMITrigger;
+  }
+
   final GlobalKey<FormState> _form = GlobalKey();
   bool _obscureText = true;
 
@@ -36,43 +68,76 @@ class _LoginScreenState extends State<LoginScreen>
   bool _isLoading = false;
 
   void login() async {
-    FocusScope.of(context).unfocus();
-    if (_form.currentState?.validate() == false) return;
-    _form.currentState?.save();
     setState(() {
-      _isLoading = true;
+      isShowConfetti = true;
+      isShowLoading = true;
     });
-    var provider = Provider.of<AuthenticationProvider>(context, listen: false);
-    try {
-      await provider.login(_username, _password);
-    } on DefaultException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.error)),
+    Future.delayed(const Duration(seconds: 1), () async {
+      FocusScope.of(context).unfocus();
+      if (_form.currentState?.validate() == false) return;
+      _form.currentState?.save();
+      setState(() {
+        _isLoading = true;
+      });
+      var provider =
+          Provider.of<AuthenticationProvider>(context, listen: false);
+      try {
+        await provider.login(_username, _password);
+      } on DefaultException catch (e) {
+        error.fire();
+        Future.delayed(
+          const Duration(seconds: 2),
+              () {
+            setState(() {
+              isShowLoading = false;
+            });
+            reset.fire();
+          },
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.error)),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      } on FieldException catch (e) {
+        var usernameError = e.fieldErrors.where((element) {
+          return element.field == "username";
+        }).toList();
+        var passwordError = e.fieldErrors.where((element) {
+          return element.field == "password";
+        }).toList();
+        setState(() {
+          _isLoading = false;
+          if (usernameError.length == 1)
+            _usernameError = usernameError[0].error;
+          if (passwordError.length == 1)
+            _passwordError = passwordError[0].error;
+        });
+        return;
+      }
+      success.fire();
+      Future.delayed(
+        const Duration(seconds: 2),
+            () {
+          confetti.fire();
+          // Navigate & hide confetti
+          Future.delayed(const Duration(seconds: 1), () {
+            setState(() {
+              isShowLoading = false;
+            });
+            // Navigator.pop(context);
+            Navigator.of(context).pushReplacement(
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 1500),
+                pageBuilder: (_, __, ___) => const MainScreen(),
+              ),
+            );
+          });
+        },
       );
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    } on FieldException catch (e) {
-      var usernameError = e.fieldErrors.where((element) {
-        return element.field == "username";
-      }).toList();
-      var passwordError = e.fieldErrors.where((element) {
-        return element.field == "password";
-      }).toList();
-      setState(() {
-        _isLoading = false;
-        if (usernameError.length == 1) _usernameError = usernameError[0].error;
-        if (passwordError.length == 1) _passwordError = passwordError[0].error;
-      });
-      return;
-    }
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 1500),
-        pageBuilder: (_, __, ___) => const MainScreen(),
-      ),
-    );
+    });
   }
 
   @override
@@ -123,7 +188,9 @@ class _LoginScreenState extends State<LoginScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(height: 20,),
+                      SizedBox(
+                        height: 20,
+                      ),
                       Image.asset(
                         "assets/foodit-website-favicon-color.png",
                         width: 200,
@@ -144,6 +211,32 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 ),
               ),
+              isShowLoading
+                  ? CustomPositioned(
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  child: RiveAnimation.asset(
+                    'assets/rive/check.riv',
+                    fit: BoxFit.fill,
+                    onInit: _onCheckRiveInit,
+                  ),
+                ),
+              )
+                  : const SizedBox(),
+              isShowConfetti
+                  ? CustomPositioned(
+                child: Container(
+                  width: 250,
+                  height: 250,
+                  child: RiveAnimation.asset(
+                    'assets/rive/4060-8417-confetti.riv',
+                    fit: BoxFit.fill,
+                    onInit: _onConfettiRiveInit,
+                  ),
+                ),
+              )
+                  : const SizedBox(),
               Align(
                 alignment: widget.animate
                     ? Alignment(0, _animation?.value ?? 3.5)
@@ -243,11 +336,13 @@ class _LoginScreenState extends State<LoginScreen>
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
-                                onPressed: (){
+                                onPressed: () {
                                   Navigator.of(context).push(
                                     PageRouteBuilder(
-                                      transitionDuration: const Duration(milliseconds: 1500),
-                                      pageBuilder: (_, __, ___) => const RegisterScreen(),
+                                      transitionDuration:
+                                          const Duration(milliseconds: 1500),
+                                      pageBuilder: (_, __, ___) =>
+                                          const RegisterScreen(),
                                     ),
                                   );
                                 },
@@ -273,6 +368,25 @@ class _LoginScreenState extends State<LoginScreen>
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+
+
+class CustomPositioned extends StatelessWidget {
+  const CustomPositioned({super.key, this.scale = 1, required this.child});
+
+  final double scale;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: Align(
+          alignment: Alignment.topCenter,
+          child: Padding(padding: EdgeInsets.fromLTRB(0,150,0,0),child: child)
       ),
     );
   }

@@ -3,9 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
+import 'package:food_it_flutter/ui/components/extras/rive_favourites_animation.dart';
 import 'package:food_it_flutter/ui/screens/auth/login_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:provider/provider.dart';
+import 'package:rive/rive.dart';
 import '../../../providers_viewmodels/restaurant_provider.dart';
 import '../../components/extras/gradient_text.dart';
 import '../../components/restaurants/restaurant_card.dart';
@@ -178,20 +180,7 @@ class EmptyFavoritesContent extends StatelessWidget {
       color: Colors.white,
       child: Column(
         children: [
-          ShaderMask(
-            blendMode: BlendMode.srcIn,
-            shaderCallback: (bounds) {
-              return const LinearGradient(
-                colors: [primaryAccent, primary],
-              ).createShader(
-                Rect.fromLTWH(0, 0, bounds.width, bounds.height),
-              );
-            },
-            child: const Icon(
-              Icons.heart_broken,
-              size: 200,
-            ),
-          ),
+          RiveFavouritesAnimation(),
           Container(
             padding: const EdgeInsets.all(10),
             alignment: Alignment.center,
