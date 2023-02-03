@@ -7,6 +7,7 @@ import '../../../data/exceptions/default_exception.dart';
 import '../../../data/exceptions/field_exception.dart';
 import '../../components/extras/action_button.dart';
 import '../../components/extras/gradient_text.dart';
+import '../../main_screen.dart';
 import '../../theme/colors.dart';
 import '../../utils/validation/regex_vals.dart';
 
@@ -154,7 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => const HomeScreen(),
+        builder: (_) => const MainScreen(),
       ),
     );
   }

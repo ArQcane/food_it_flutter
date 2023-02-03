@@ -4,6 +4,7 @@ import 'package:food_it_flutter/ui/screens/auth/login_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/exceptions/logged_out_exception.dart';
+import '../../main_screen.dart';
 import '../../theme/colors.dart';
 import '../restaurant/home_screen.dart';
 
@@ -54,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 1500),
-        pageBuilder: (_, __, ___) => const HomeScreen(),
+        pageBuilder: (_, __, ___) => const MainScreen(),
       ),
     );
   }

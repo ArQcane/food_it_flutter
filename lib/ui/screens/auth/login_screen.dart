@@ -10,6 +10,7 @@ import '../../../data/exceptions/default_exception.dart';
 import '../../../data/exceptions/field_exception.dart';
 import '../../components/extras/action_button.dart';
 import '../../components/extras/gradient_text.dart';
+import '../../main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool animate;
@@ -69,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen>
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 1500),
-        pageBuilder: (_, __, ___) => const HomeScreen(),
+        pageBuilder: (_, __, ___) => const MainScreen(),
       ),
     );
   }
