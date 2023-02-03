@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:food_it_flutter/domain/review/review.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
-import 'package:food_it_flutter/ui/components/action_button.dart';
+import 'package:food_it_flutter/ui/components/extras/action_button.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/exceptions/default_exception.dart';
-import '../../data/exceptions/field_exception.dart';
+import '../../../data/exceptions/default_exception.dart';
+import '../../../data/exceptions/field_exception.dart';
 
 class EditReviewDialog extends StatefulWidget {
   final TransformedReview reviewObj;
@@ -104,7 +104,7 @@ class _EditReviewDialogState extends State<EditReviewDialog> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       setState(() {
         review = widget.reviewObj.review.review;
         rating = widget.reviewObj.review.rating.toDouble();
@@ -114,7 +114,7 @@ class _EditReviewDialogState extends State<EditReviewDialog> {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width - 32;
+    var width = MediaQuery.of(context).size.width - 64;
 
     return Center(
       child: FittedBox(

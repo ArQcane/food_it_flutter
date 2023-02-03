@@ -5,9 +5,9 @@ import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
 import 'package:food_it_flutter/ui/screens/restaurant/specific_restaurant_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 
-import '../../domain/restaurant/restaurant.dart';
-import '../../domain/user/user.dart';
-import '../../providers_viewmodels/restaurant_provider.dart';
+import '../../../domain/restaurant/restaurant.dart';
+import '../../../domain/user/user.dart';
+import '../../../providers_viewmodels/restaurant_provider.dart';
 
 class RestaurantCard extends StatelessWidget {
   final TransformedRestaurant transformedRestaurant;

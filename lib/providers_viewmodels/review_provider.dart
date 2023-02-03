@@ -30,7 +30,9 @@ class ReviewProvider extends ChangeNotifier {
 
   Future<void> getReviews() async {
     try {
-      var reviews = await _reviewRepo.getAllReviews();
+      var reviews = await _reviewRepo.getAllReviews()..sort((a, b) {
+        return b.dateposted.compareTo(a.dateposted);
+      });
       var transformedReview = reviews.map((e) async {
         var user = await _userRepo.getUserById(
           id: e.iduser.toString(),

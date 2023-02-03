@@ -5,12 +5,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
-import 'package:food_it_flutter/ui/components/action_button.dart';
-import 'package:food_it_flutter/ui/components/add_review_form.dart';
-import 'package:food_it_flutter/ui/components/edit_comment_dialog.dart';
-import 'package:food_it_flutter/ui/components/gradient_text.dart';
-import 'package:food_it_flutter/ui/components/review_card.dart';
-import 'package:food_it_flutter/ui/components/review_tab_grphs.dart';
+
+import 'package:food_it_flutter/ui/components/reviews/edit_review_dialog.dart';
+
+import 'package:food_it_flutter/ui/components/reviews/review_tab_grphs.dart';
+import 'package:food_it_flutter/ui/screens/restaurant/all_reviews_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -20,6 +19,10 @@ import '../../../data/exceptions/default_exception.dart';
 import '../../../data/exceptions/field_exception.dart';
 import '../../../domain/review/review.dart';
 import '../../../providers_viewmodels/restaurant_provider.dart';
+import '../../components/extras/action_button.dart';
+import '../../components/extras/gradient_text.dart';
+import '../../components/reviews/add_review_form.dart';
+import '../../components/reviews/review_card.dart';
 
 class SpecificRestaurantScreen extends StatefulWidget {
   final String restaurantId;
@@ -85,36 +88,16 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const GradientText(
-                        text: "Data",
-                        textStyle: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                       const SizedBox(height: 5),
                       _buildRestaurantReviewMetaData(
                         reviewsOfRestaurant,
                         transformedRestaurant,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       _userWhoFavouriteProgressbar(reviewsOfRestaurant,
                           transformedRestaurant, authProvider),
-                      const SizedBox(height: 10),
-                      const GradientText(
-                        text: "Biography",
-                        textStyle: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        transformedRestaurant.restaurant.biography,
-                        style: const TextStyle(fontSize: 18),
-                      ),
                       const SizedBox(height: 10),
                       const GradientText(
                         text: "Location of Restaurant",
@@ -144,6 +127,32 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const GradientText(
+                            text: "Reviews",
+                            textStyle: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (reviewsOfRestaurant.isNotEmpty)
+                            ActionButton(
+                                onClick: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => AllReviewsScreen(
+                                          restaurantId: widget.restaurantId,
+                                        ),
+                                      ),
+                                    ),
+                                text: "See all")
+                        ],
+                      ),
                       const SizedBox(height: 10),
                       AddReviewForm(restaurantId: widget.restaurantId),
                       const SizedBox(height: 10),
@@ -158,6 +167,19 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                           children: [
                             ReviewTabGraphs(
                               reviewsOfRestaurant: reviewsOfRestaurant,
+                            ),
+                            const SizedBox(height: 10),
+                            const Material(
+                              elevation: 3,
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                child:
+                                    GradientText(text: "3 Most Recent Reviews"),
+                              ),
                             ),
                             const SizedBox(height: 10),
                             SingleChildScrollView(
@@ -183,13 +205,17 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                                           showDialog(
                                             context: context,
                                             builder: (_) => EditReviewDialog(
-                                              reviewObj: reviewsOfRestaurant[index],
+                                              reviewObj:
+                                                  reviewsOfRestaurant[index],
                                             ),
                                           );
                                         },
                                         deleteReview: () {
                                           reviewProvider.deleteReview(
-                                            reviewsOfRestaurant[index].review.review_id.toString(),
+                                            reviewsOfRestaurant[index]
+                                                .review
+                                                .review_id
+                                                .toString(),
                                           );
                                         },
                                       ),
@@ -227,7 +253,8 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                                     bounds.height,
                                   ),
                                 ),
-                                child: const Icon(Icons.insert_comment_outlined, size: 150),
+                                child: const Icon(Icons.insert_comment_outlined,
+                                    size: 150),
                               ),
                               const Text(
                                 "No reviews yet",
@@ -246,6 +273,19 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                             ],
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 10),
+                      const GradientText(
+                        text: "Biography",
+                        textStyle: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        transformedRestaurant.restaurant.biography,
+                        style: const TextStyle(fontSize: 18),
                       ),
                     ]),
               ),
@@ -345,14 +385,14 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
               ],
             ),
             Padding(
-              padding: EdgeInsets.all(5),
+              padding: const EdgeInsets.all(5),
               child: LinearPercentIndicator(
                 width: MediaQuery.of(context).size.width - 215,
                 animation: true,
                 animateFromLastPercent: true,
                 lineHeight: 12.0,
                 animationDuration: 1000,
-                trailing: Icon(
+                trailing: const Icon(
                   Icons.person_pin_circle,
                   color: primary,
                   size: 30,
@@ -414,10 +454,10 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
         floating: false,
         pinned: true,
         leading: Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
               color: materialColor.withOpacity(1 - percent),
             ),
             child: IconButton(
@@ -429,10 +469,10 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
                 color: materialColor.withOpacity(1 - percent),
               ),
               child: IconButton(
@@ -463,14 +503,14 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
               ? Material(
                   elevation: 4,
                   color: materialColor.withOpacity(1 - percent),
-                  animationDuration: Duration(milliseconds: 1000),
+                  animationDuration: const Duration(milliseconds: 1000),
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(
                       Radius.circular(10),
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
                     child: Text(
                       transformedRestaurant.restaurant.restaurant_name,
                       style: TextStyle(
@@ -494,4 +534,3 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
     });
   }
 }
-

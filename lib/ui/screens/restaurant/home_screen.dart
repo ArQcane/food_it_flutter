@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
-import 'package:food_it_flutter/ui/components/gradient_text.dart';
 import 'package:food_it_flutter/ui/screens/auth/login_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:provider/provider.dart';
 import '../../../providers_viewmodels/restaurant_provider.dart';
-import '../../components/restaurant_card.dart';
+import '../../components/extras/gradient_text.dart';
+import '../../components/restaurants/restaurant_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);

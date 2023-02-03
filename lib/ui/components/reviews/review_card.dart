@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
-import 'package:food_it_flutter/ui/components/gradient_text.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/exceptions/default_exception.dart';
-import '../../domain/review/review.dart';
-import '../../providers_viewmodels/review_provider.dart';
-import '../theme/colors.dart';
+import '../../../providers_viewmodels/review_provider.dart';
+import '../../theme/colors.dart';
+import '../extras/gradient_text.dart';
+
 
 class ReviewCard extends StatelessWidget {
   final TransformedReview review;
@@ -110,29 +109,51 @@ class ReviewCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 5),
-            Row(
-              children: [
-                const Icon(
-                  Icons.star,
-                  color: primary,
-                ),
-                const SizedBox(width: 5),
-                Text(
-                  review.review.rating.toStringAsFixed(1),
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+            Column(children: [
+              Row(
+                children: [
+                  Text(
+                    review.review.rating.toStringAsFixed(1),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const Opacity(
-                  opacity: 0.5,
-                  child: Text(
-                    "/5",
-                    style: TextStyle(fontSize: 18),
+                  const Opacity(
+                    opacity: 0.5,
+                    child: Text(
+                      "/5",
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
-                )
-              ],
-            ),
+                  SizedBox(width: 10,),
+                  Row(
+                    children: List.generate(
+                      review.review.rating.toInt(),
+                          (index) {
+                        return Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                FocusScope.of(context).unfocus();
+                              },
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              splashRadius: 20,
+                              icon: Icon(
+                                Icons.star,
+                                color: primary,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ]),
             const SizedBox(height: 5),
             Opacity(
               opacity: 0.5,

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:food_it_flutter/ui/components/extras/rive_animated_check.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/exceptions/default_exception.dart';
-import '../../data/exceptions/field_exception.dart';
-import '../../providers_viewmodels/authentication_provider.dart';
-import '../../providers_viewmodels/review_provider.dart';
-import '../theme/colors.dart';
-import 'action_button.dart';
+import '../../../data/exceptions/default_exception.dart';
+import '../../../data/exceptions/field_exception.dart';
+import '../../../providers_viewmodels/authentication_provider.dart';
+import '../../../providers_viewmodels/review_provider.dart';
+import '../../theme/colors.dart';
+import '../extras/action_button.dart';
 
 class AddReviewForm extends StatefulWidget {
   final String restaurantId;
@@ -27,6 +28,7 @@ class _ReviewFormState extends State<AddReviewForm> {
   String? reviewError;
   String? ratingError;
   bool isLoading = false;
+  bool onSucceed = false;
 
   bool _validateRating() {
     if (rating != 0) return true;
@@ -62,10 +64,10 @@ class _ReviewFormState extends State<AddReviewForm> {
       );
     } on FieldException catch (e) {
       var reviewError = e.fieldErrors.where(
-            (element) => element.field == "review",
+        (element) => element.field == "review",
       );
       var ratingError = e.fieldErrors.where(
-            (element) => element.field == "rating",
+        (element) => element.field == "rating",
       );
       if (reviewError.isNotEmpty) {
         setState(() {
@@ -86,9 +88,14 @@ class _ReviewFormState extends State<AddReviewForm> {
     } finally {
       _formKey.currentState!.reset();
       setState(() {
+        onSucceed = true;
         isLoading = false;
         review = "";
         rating = 0;
+      });
+      await Future.delayed(Duration(seconds: 3));
+      setState(() {
+        onSucceed = false;
       });
     }
   }
@@ -142,7 +149,7 @@ class _ReviewFormState extends State<AddReviewForm> {
                   mainAxisSize: MainAxisSize.min,
                   children: List.generate(
                     5,
-                        (index) {
+                    (index) {
                       return Row(
                         children: [
                           IconButton(
@@ -174,13 +181,19 @@ class _ReviewFormState extends State<AddReviewForm> {
                 ),
               ),
               const SizedBox(width: 10),
-              Expanded(
-                child: ActionButton(
-                  onClick: submit,
-                  isLoading: isLoading,
-                  text: "Submit",
+              if(onSucceed)
+                Expanded(child: Center(child: RiveAnimationCheck()))
+              else
+                Expanded(
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    
+                    child: ActionButton(
+                      onClick: submit,
+                      text: "Submit",
+                    ),
+                  ),
                 ),
-              ),
             ],
           ),
           const SizedBox(height: 5),
