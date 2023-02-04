@@ -43,6 +43,7 @@ dependencies:
   percent_indicator: ^4.0.1
   intl: ^0.18.0
   rive: ^0.9.1
+  image_picker: ^0.8.6+1
 
 dev_dependencies:
   flutter_test:

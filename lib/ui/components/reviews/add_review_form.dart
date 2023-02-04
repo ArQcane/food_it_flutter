@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:food_it_flutter/ui/components/extras/rive_animated_check.dart';
+import 'package:food_it_flutter/ui/components/extras/rive_animations/rive_animated_check.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/exceptions/default_exception.dart';

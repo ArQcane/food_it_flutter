@@ -3,16 +3,23 @@ import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dar
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../providers_viewmodels/restaurant_provider.dart';
 import '../../../providers_viewmodels/review_provider.dart';
 import '../../theme/colors.dart';
 import '../extras/gradient_text.dart';
 
+
+enum ReviewMode {
+  profile,
+  restaurant,
+}
 
 class ReviewCard extends StatelessWidget {
   final TransformedReview review;
   final double width;
   final void Function() editReview;
   final void Function() deleteReview;
+  final ReviewMode reviewMode;
 
   const ReviewCard({
     Key? key,
@@ -20,14 +27,22 @@ class ReviewCard extends StatelessWidget {
     required this.width,
     required this.editReview,
     required this.deleteReview,
+    this.reviewMode = ReviewMode.profile,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var authProvider = Provider.of<AuthenticationProvider>(context);
+    var restaurantProvider = Provider.of<RestaurantProvider>(context);
     var currentUser = authProvider.user;
     var shouldShowEditBtn =
         currentUser != null && currentUser.user_id == review.reviewUser.user_id;
+
+    var reviewedRestaurant = restaurantProvider.restaurantList
+        .where((e) => e.restaurant.restaurant_id == review.review.idrestaurant)
+        .toList();
+
+    int index = reviewedRestaurant.indexWhere((restaurant) => restaurant.restaurant.restaurant_id==review.review.idrestaurant);
 
     return Material(
       elevation: 4,
@@ -65,15 +80,20 @@ class ReviewCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(100),
                         ),
                         child: ClipOval(
-                            child: authProvider.imageFromBase64String(review
-                                        .reviewUser.profile_pic ==
-                                    null
+                            child: reviewMode == ReviewMode.restaurant
+                                ? Image.network(reviewedRestaurant[index].restaurant.restaurant_logo)
+                                : authProvider.imageFromBase64String(review
+                                .reviewUser.profile_pic ==
+                                null
                                 ? "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII"
-                                : review.reviewUser.profile_pic!)),
+                                : review.reviewUser.profile_pic!),
+                            ),
                       ),
                       const SizedBox(width: 5),
                       GradientText(
-                        text: review.reviewUser.username,
+                        text: reviewMode == ReviewMode.profile
+                            ? review.reviewUser.username
+                            : reviewedRestaurant[index].restaurant.restaurant_name,
                         textStyle: const TextStyle(fontSize: 20),
                       ),
                     ],

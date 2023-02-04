@@ -5,27 +5,27 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/data/exceptions/logged_out_exception.dart';
 import 'package:food_it_flutter/domain/user/user_repository.dart';
+import 'package:food_it_flutter/providers_viewmodels/user_provider.dart';
 
 import '../data/exceptions/default_exception.dart';
-import '../domain/review/review_user.dart';
 import '../domain/user/user.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   final UserRepository _userRepo;
-  final BuildContext _context;
+  final UserProvider _userProvider;
   String? token;
   User? user;
   List<User> allUsersInDB = [];
 
-  AuthenticationProvider(this._context, this._userRepo) {
+  AuthenticationProvider(this._userRepo,this._userProvider) {
     (() async {
-      await getAllUsersInDatabase();
       try {
         await retrieveToken();
       } on UnauthenticatedException {
         return;
       }
       await getCurrentLoggedInUser();
+      await getAllUsersInDatabase();
     })();
   }
 
@@ -53,12 +53,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<void> getCurrentLoggedInUser() async {
     if (token == null) {
-      ScaffoldMessenger.of(_context).showSnackBar(
-        const SnackBar(
-          content: Text("Must be logged in to do this action!"),
-        ),
-      );
-      return;
+      throw UnauthenticatedException();
     }
     user = await _userRepo.validateToken(token: token!);
     notifyListeners();
@@ -69,9 +64,7 @@ class AuthenticationProvider extends ChangeNotifier {
       allUsersInDB = await _userRepo.getAllUsers();
       notifyListeners();
     } on DefaultException catch (e) {
-      ScaffoldMessenger.of(_context).showSnackBar(
-        SnackBar(content: Text(e.error)),
-      );
+
     }
   }
 
@@ -116,5 +109,53 @@ class AuthenticationProvider extends ChangeNotifier {
     user = null;
     await _userRepo.removeToken();
     notifyListeners();
+
+  }
+
+  Future<void> updateAccountCredentials(String userId, String firstName, String lastName, int mobileNumber, String address, String profilePic) async {
+
+    if (token == null) {
+      throw UnauthenticatedException();
+    }
+    var updatedToken = await _userRepo.updateUserCredentials(
+      userId: userId,
+      firstName: firstName,
+      lastName: lastName,
+      mobileNumber: mobileNumber,
+      address: address,
+      profilePic: profilePic,
+    );
+    await getCurrentLoggedInUser();
+    _userProvider.users = _userProvider.users.map((e) {
+      if (e.user_id == user!.user_id) {
+        return user!;
+      }
+      return e;
+    }).toList();
+    _userProvider.notifyListeners();
+  }
+
+  Future<void> updatePassword(String email) async {
+    if (token == null) {
+      throw UnauthenticatedException();
+    }
+    await _userRepo.resetPassword(
+      email: email,
+    );
+    notifyListeners();
+  }
+
+  Future<void> deleteAccount(String userId) async {
+    if (token == null) {
+      throw UnauthenticatedException();
+    }
+    await _userRepo.deleteUser(
+      userId: userId,
+    );
+    await logOut();
+    _userProvider.users = _userProvider.users.where((e) {
+      return e.user_id != user!.user_id;
+    }).toList();
+    _userProvider.notifyListeners();
   }
 }

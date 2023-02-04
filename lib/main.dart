@@ -5,9 +5,11 @@ import 'package:food_it_flutter/data/favourites/remote/remote_favourite_dao_impl
 import 'package:food_it_flutter/data/review/remote/remote_review_dao_impl.dart';
 import 'package:food_it_flutter/data/review/review_repository_impl.dart';
 import 'package:food_it_flutter/data/user/local/local_user_dao_impl.dart';
+import 'package:food_it_flutter/domain/review/review.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/providers_viewmodels/restaurant_provider.dart';
 import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
+import 'package:food_it_flutter/providers_viewmodels/user_provider.dart';
 import 'package:food_it_flutter/ui/foodit_app.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:provider/provider.dart';
@@ -46,17 +48,33 @@ void main() async {
     remoteCommentDao: RemoteReviewDaoImpl(),
   );
 
+  UserProvider userProvider = UserProvider(userRepo);
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => AuthenticationProvider(context, userRepo),
+          create: (context) => userProvider,
         ),
         ChangeNotifierProvider(
-          create: (context) => RestaurantProvider(context, restaurantRepo, favouriteRepo),
+          create: (context) => AuthenticationProvider(
+            userRepo,
+            userProvider,
+          ),
         ),
         ChangeNotifierProvider(
-          create: (context) => ReviewProvider(context, reviewRepo, userRepo),
+          create: (context) => RestaurantProvider(
+            context,
+            restaurantRepo,
+            favouriteRepo,
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ReviewProvider(
+            context,
+            reviewRepo,
+            userRepo
+          ),
         ),
       ],
       child: const FoodItApp(),

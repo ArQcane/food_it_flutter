@@ -73,7 +73,7 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<String> updateUserCredentials({String? userId, String? firstName, String? lastName, int? mobileNumber, String? address, String? profilePic, bool? deleteProfilePic}) {
+  Future<String> updateUserCredentials({String? userId, String? firstName, String? lastName, int? mobileNumber, String? address, String? profilePic}) {
     return _remoteUserDao.updateUserCredentials(
       userId: userId,
       firstName: firstName,
@@ -81,7 +81,6 @@ class UserRepositoryImpl implements UserRepository {
       mobileNumber: mobileNumber,
       address: address,
       profilePic: profilePic,
-      deleteProfilePic: deleteProfilePic,
     );
   }
 

@@ -3,80 +3,16 @@ import 'dart:math';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/ui/screens/favourites/favourite_screen.dart';
 import 'package:food_it_flutter/ui/screens/profile/profile_screen.dart';
 import 'package:food_it_flutter/ui/screens/restaurant/home_screen.dart';
 import 'package:food_it_flutter/ui/screens/search/search_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:food_it_flutter/ui/utils/rive_utils.dart';
-import 'package:rive/rive.dart';
-
+import 'package:provider/provider.dart';
 import 'components/btm_nav_item.dart';
-import 'components/model/menu.dart';
-
-// class MainScreen extends StatefulWidget {
-//   const MainScreen({Key? key}) : super(key: key);
-//
-//   @override
-//   State<MainScreen> createState() => _MainScreenState();
-// }
-//
-// class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
-//   var currentIndex = 0;
-//   var reverse = false;
-//   var screens = [
-//     const HomeScreen(),
-//     const SearchScreen(),
-//     const ProfileScreen(),
-//   ];
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       bottomNavigationBar: BottomNavigationBar(
-//         items: const [
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.home),
-//             label: 'Home',
-//           ),
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.search),
-//             label: 'Search',
-//           ),
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.person),
-//             label: 'Profile',
-//           ),
-//         ],
-//         selectedItemColor: primary,
-//         unselectedItemColor: primary.withAlpha(125),
-//         showSelectedLabels: false,
-//         showUnselectedLabels: false,
-//         currentIndex: currentIndex,
-//         onTap: (index) {
-//           setState(() {
-//             reverse = index < currentIndex;
-//             currentIndex = index;
-//           });
-//         },
-//       ),
-//       body: PageTransitionSwitcher(
-//         duration: const Duration(milliseconds: 750),
-//         reverse: reverse,
-//         transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
-//           return SharedAxisTransition(
-//             animation: primaryAnimation,
-//             secondaryAnimation: secondaryAnimation,
-//             transitionType: SharedAxisTransitionType.horizontal,
-//             child: child,
-//           );
-//         },
-//         child: screens[currentIndex],
-//       ),
-//     );
-//   }
-// }
-
+import 'components/rive_models/menu.dart';
 
 class MainScreen extends StatefulWidget{
   const MainScreen({Key? key}) : super(key: key);
@@ -88,12 +24,6 @@ class MainScreen extends StatefulWidget{
 class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin{
   var currentIndex = 0;
   var reverse = false;
-  var screens = [
-    const HomeScreen(),
-    const SearchScreen(),
-    const FavouriteScreen(),
-    const ProfileScreen(),
-  ];
 
   Menu selectedBottomNav = bottomNavItems.first;
 
@@ -133,6 +63,14 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    var authProvider = Provider.of<AuthenticationProvider>(context);
+    var currentUser = authProvider.user;
+    var screens = [
+      const HomeScreen(),
+      const SearchScreen(),
+      currentUser != null ? FavouriteScreen(user: currentUser) : Container(),
+      currentUser != null ? ProfileScreen(user: currentUser) : Container(),
+    ];
     return Scaffold(
       extendBody: true,
       backgroundColor: background,

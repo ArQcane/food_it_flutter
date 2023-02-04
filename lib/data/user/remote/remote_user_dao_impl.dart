@@ -142,49 +142,33 @@ class RemoteUserDaoImpl extends NetworkUtils implements RemoteUserDao {
   }
 
   @override
-  Future<String> updateUserCredentials(
-      {String? userId,
-      String? firstName,
-      String? lastName,
-      int? mobileNumber,
-      String? address,
-      String? profilePic,
-      bool? deleteProfilePic}) async {
-    var request = MultipartRequest("PUT", createUrl(endpoint: "/updateuser"));
-    int length = 0;
-    if (firstName != null) {
-      request.fields["first_name"] = firstName;
-      length += 1;
-    }
-    if (lastName != null) {
-      request.fields["last_name"] = lastName;
-      length += 1;
-    }
-    if (mobileNumber != null) {
-      request.fields["mobile_number"] = mobileNumber.toString();
-      length += 1;
-    }
-    if (address != null) {
-      request.fields["address"] = address;
-      length += 1;
-    }
-    if (profilePic != null) {
-      request.fields["profile_pic"] = profilePic;
-      length += 1;
-    }
-    if (length == 0) {
-      throw DefaultException(error: "Must have at least one field to update!");
-    }
-    var response = await Response.fromStream(await request.send());
+  Future<String> updateUserCredentials({
+    String? userId,
+    String? firstName,
+    String? lastName,
+    int? mobileNumber,
+    String? address,
+    String? profilePic,
+  }) async {
+    var response = await put(
+      createUrl(endpoint: "/updateUserMobile/$userId"),
+      body: {
+        "first_name": firstName,
+        "last_name": lastName,
+        "mobile_number": mobileNumber.toString(),
+        "address": address,
+        "profile_pic": profilePic,
+      },
+    );
+    var body = jsonDecode(response.body);
     if (response.statusCode != 200) {
       throw DefaultException.fromJson(jsonDecode(response.body));
     }
-    var body = jsonDecode(response.body);
-    var token = body["token"];
-    if (token == null) {
+    var message = body["result"];
+    if (message == null) {
       throw DefaultException(error: "Unknown error has occurred");
     }
-    return token;
+    return message;
   }
 
   @override

@@ -18,7 +18,6 @@ abstract class RemoteUserDao {
     int? mobileNumber,
     String? address,
     String? profilePic,
-    bool? deleteProfilePic
   });
   Future<String> login({
     required String username,

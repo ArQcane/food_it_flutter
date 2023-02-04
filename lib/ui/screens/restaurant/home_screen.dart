@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/providers_viewmodels/review_provider.dart';
-import 'package:food_it_flutter/ui/components/extras/rive_favourites_animation.dart';
+import 'package:food_it_flutter/ui/components/extras/rive_animations/rive_favourites_animation.dart';
 import 'package:food_it_flutter/ui/screens/auth/login_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:provider/provider.dart';
