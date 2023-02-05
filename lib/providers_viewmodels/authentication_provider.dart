@@ -136,9 +136,6 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<void> updatePassword(String email) async {
-    if (token == null) {
-      throw UnauthenticatedException();
-    }
     await _userRepo.resetPassword(
       email: email,
     );

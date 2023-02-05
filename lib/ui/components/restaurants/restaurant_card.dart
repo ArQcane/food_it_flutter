@@ -66,6 +66,7 @@ class RestaurantCard extends StatelessWidget {
         openBuilder: (context, closeContainer) => SpecificRestaurantScreen(
           restaurantId: transformedRestaurant.restaurant.restaurant_id.toString(),
         ),
+
         closedElevation: 4,
         closedColor: isDarkMode
             ? ElevationOverlay.colorWithOverlay(

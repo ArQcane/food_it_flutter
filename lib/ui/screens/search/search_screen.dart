@@ -4,6 +4,7 @@ import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dar
 import 'package:food_it_flutter/ui/components/extras/gradient_text.dart';
 import 'package:food_it_flutter/ui/screens/restaurant/specific_restaurant_screen.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
+import 'package:glassmorphism/glassmorphism.dart';
 import 'package:provider/provider.dart';
 
 import '../../../domain/user/user.dart';
@@ -29,17 +30,19 @@ class _SearchScreenState extends State<SearchScreen> {
     var restaurantList = restaurantProvider.restaurantList
         .where(
           (element) => element.restaurant.restaurant_name
-          .toLowerCase()
-          .contains(query.toLowerCase()),
-    )
+              .toLowerCase()
+              .contains(query.toLowerCase()),
+        )
         .toList()
       ..sort(
-            (a, b) => a.restaurant.restaurant_name
+        (a, b) => a.restaurant.restaurant_name
             .toLowerCase()
             .indexOf(query.toLowerCase())
             .compareTo(
-          b.restaurant.restaurant_name.toLowerCase().indexOf(query.toLowerCase()),
-        ),
+              b.restaurant.restaurant_name
+                  .toLowerCase()
+                  .indexOf(query.toLowerCase()),
+            ),
       );
 
     return Scaffold(
@@ -124,16 +127,16 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildRestaurantCards(
-      List<TransformedRestaurant> restaurantList,
-      User currentUser,
-      RestaurantProvider restaurantProvider,
-      String token,
-      ) {
+    List<TransformedRestaurant> restaurantList,
+    User currentUser,
+    RestaurantProvider restaurantProvider,
+    String token,
+  ) {
     return Column(
       children: restaurantList.map(
-            (e) {
+        (e) {
           var isFavoritedByCurrentUser = e.usersWhoFavRestaurant.any(
-                (element) => element.userId == currentUser.user_id,
+            (element) => element.userId == currentUser.user_id,
           );
 
           return Padding(
@@ -143,6 +146,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 return _buildSearchCard(
                   leadingImageUrl: e.restaurant.restaurant_logo,
                   title: e.restaurant.restaurant_name,
+                  location: e.restaurant.location,
+                  rating: e.restaurant.average_rating.toString(),
+                  cuisine: e.restaurant.cuisine,
                   onTap: openContainer,
                   trailing: ShaderMask(
                     blendMode: BlendMode.srcIn,
@@ -191,6 +197,9 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildSearchCard({
     required String? leadingImageUrl,
     required String title,
+    required String location,
+    required String cuisine,
+    required String rating,
     Widget? trailing,
     void Function()? onTap,
   }) {
@@ -200,6 +209,20 @@ class _SearchScreenState extends State<SearchScreen> {
     return InkWell(
       onTap: onTap,
       child: ListTile(
+        isThreeLine: true,
+        subtitle: RichText(
+          text: TextSpan(
+            style: TextStyle(
+              fontSize: 15,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+            ),
+            children: [
+              TextSpan(
+                text: "$location - $cuisine" + "\n$rating"
+              ),
+            ],
+          ),
+        ),
         leading: Container(
           width: 40,
           height: 40,
@@ -213,17 +236,17 @@ class _SearchScreenState extends State<SearchScreen> {
           child: leadingImageUrl == null
               ? const Icon(Icons.person)
               : ClipOval(
-            child: Image.network(
-              leadingImageUrl,
-              fit: BoxFit.cover,
-            ),
-          ),
+                  child: Image.network(
+                    leadingImageUrl,
+                    fit: BoxFit.cover,
+                  ),
+                ),
         ),
         title: RichText(
           text: TextSpan(
             style: TextStyle(
               fontSize: 18,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: primary,
             ),
             children: [
               TextSpan(

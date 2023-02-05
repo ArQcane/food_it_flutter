@@ -62,18 +62,6 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     const Padding(
                       padding: EdgeInsets.all(5),
-                      child: GradientText(text: "Your Favorite Restaurants"),
-                    ),
-                    FavouriteRestaurantSection(
-                      restaurantProvider: restaurantProvider,
-                      authProvider: authProvider,
-                      reviewProvider: reviewProvider,
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(5),
                       child: GradientText(text: "Featured Restaurants"),
                     ),
                     FeaturedRestaurantSection(
@@ -96,105 +84,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-    );
-  }
-}
-
-class FavouriteRestaurantSection extends StatelessWidget {
-  const FavouriteRestaurantSection({
-    Key? key,
-    required this.restaurantProvider,
-    required this.authProvider,
-    required this.reviewProvider,
-  }) : super(key: key);
-
-  final RestaurantProvider restaurantProvider;
-  final AuthenticationProvider authProvider;
-  final ReviewProvider reviewProvider;
-
-  @override
-  Widget build(BuildContext context) {
-    var currentUser = authProvider.user;
-
-    var favouriteRestaurants = restaurantProvider.restaurantList
-        .where(
-          (element) => element.usersWhoFavRestaurant
-              .map((e) => e.userId)
-              .contains(currentUser?.user_id),
-        )
-        .toList()
-      ..sort((a, b) => a.restaurant.restaurant_name.compareTo(b.restaurant.restaurant_name));
-
-    if (favouriteRestaurants.isEmpty) return const EmptyFavoritesContent();
-
-    return SizedBox(
-      width: double.infinity,
-      height: 310,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          return SizedBox(
-            width: MediaQuery.of(context).size.width / 2,
-            child: RestaurantCard(
-              toggleFavourite: (toggleFav, restaurantId) {
-                if (toggleFav) {
-                  restaurantProvider.toggleRestaurantFavourite(
-                      restaurantId,
-                      currentUser!,
-                      toggleFav
-                  );
-                  return;
-                }
-                restaurantProvider.removeRestaurantFromFavorite(
-                  restaurantId,
-                  currentUser!,
-                );
-              },
-              reviewsOfRestaurant: reviewProvider.reviewList
-                  .where(
-                    (element) =>
-                        element.review.idrestaurant ==
-                        favouriteRestaurants[index].restaurant.restaurant_id,
-                  )
-                  .toList(),
-              currentUser: currentUser,
-              transformedRestaurant: favouriteRestaurants[index],
-            ),
-          );
-        },
-        itemCount: min(favouriteRestaurants.length, 5),
-      ),
-    );
-  }
-}
-
-class EmptyFavoritesContent extends StatelessWidget {
-  const EmptyFavoritesContent({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Column(
-        children: [
-          RiveFavouritesAnimation(),
-          Container(
-            padding: const EdgeInsets.all(10),
-            alignment: Alignment.center,
-            child: Text(
-              "Seems like you don't have any favourites yet!\nTry favoriting a restaurant now!",
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headline6!.copyWith(
-                    color: primary,
-                    fontWeight: FontWeight.normal,
-                  ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

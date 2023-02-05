@@ -11,7 +11,9 @@ import '../../../data/exceptions/default_exception.dart';
 import '../../../data/exceptions/field_exception.dart';
 import '../../components/extras/action_button.dart';
 import '../../components/extras/gradient_text.dart';
+import '../../components/extras/rive_animations/animated_btn.dart';
 import '../../main_screen.dart';
+import 'forget_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool animate;
@@ -68,16 +70,14 @@ class _LoginScreenState extends State<LoginScreen>
   bool _isLoading = false;
 
   void login() async {
-    setState(() {
-      isShowConfetti = true;
-      isShowLoading = true;
-    });
     Future.delayed(const Duration(seconds: 1), () async {
       FocusScope.of(context).unfocus();
       if (_form.currentState?.validate() == false) return;
       _form.currentState?.save();
       setState(() {
         _isLoading = true;
+        isShowLoading = true;
+        isShowConfetti = true;
       });
       var provider =
           Provider.of<AuthenticationProvider>(context, listen: false);
@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen>
         await provider.login(_username, _password);
       } on DefaultException catch (e) {
         error.fire();
-        Future.delayed(
+        await Future.delayed(
           const Duration(seconds: 2),
               () {
             setState(() {
@@ -125,6 +125,7 @@ class _LoginScreenState extends State<LoginScreen>
           // Navigate & hide confetti
           Future.delayed(const Duration(seconds: 1), () {
             setState(() {
+              isShowConfetti = false;
               isShowLoading = false;
             });
             // Navigator.pop(context);
@@ -143,6 +144,10 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void initState() {
     super.initState();
+    _btnAnimationController = OneShotAnimation(
+      "active",
+      autoplay: false,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller = AnimationController(
         vsync: this,
@@ -224,19 +229,19 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
               )
                   : const SizedBox(),
-              isShowConfetti
-                  ? CustomPositioned(
-                child: Container(
-                  width: 250,
-                  height: 250,
-                  child: RiveAnimation.asset(
-                    'assets/rive/4060-8417-confetti.riv',
-                    fit: BoxFit.fill,
-                    onInit: _onConfettiRiveInit,
+                isShowConfetti
+                    ? CustomPositioned(
+                  child: Container(
+                    width: 250,
+                    height: 250,
+                    child: RiveAnimation.asset(
+                      'assets/rive/4060-8417-confetti.riv',
+                      fit: BoxFit.fill,
+                      onInit: _onConfettiRiveInit,
+                    ),
                   ),
-                ),
-              )
-                  : const SizedBox(),
+                )
+                    : const SizedBox(),
               Align(
                 alignment: widget.animate
                     ? Alignment(0, _animation?.value ?? 3.5)
@@ -244,6 +249,7 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Container(
                   height: 425,
                   child: Card(
+                    color: secondaryAccent,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(25),
@@ -254,111 +260,128 @@ class _LoginScreenState extends State<LoginScreen>
                         vertical: 20,
                         horizontal: 20,
                       ),
-                      child: Form(
-                        key: _form,
-                        child: Column(
-                          children: [
-                            const Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "Welcome Back!",
-                                  style: TextStyle(
-                                      color: primary,
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold),
-                                )),
-                            const Align(
-                                alignment: Alignment.centerLeft,
-                                child: GradientText(
-                                  text: "Log Back In!",
-                                  textStyle: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w900),
-                                )),
-                            const SizedBox(height: 25),
-                            TextFormField(
-                              decoration: InputDecoration(
-                                label: const Text("Username"),
-                                border: const OutlineInputBorder(),
-                                errorText: _usernameError,
-                              ),
-                              onChanged: (_) {
-                                if (_usernameError == null) return;
-                                setState(() {
-                                  _usernameError = null;
-                                });
-                              },
-                              textInputAction: TextInputAction.next,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Username required!";
-                                }
-                                return null;
-                              },
-                              onSaved: (value) {
-                                _username = value!;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              decoration: InputDecoration(
-                                label: const Text("Password"),
-                                border: const OutlineInputBorder(),
-                                suffixIcon: IconButton(
-                                  icon: _obscureText
-                                      ? const Icon(Icons.visibility)
-                                      : const Icon(Icons.visibility_off),
-                                  onPressed: () => setState(() {
-                                    _obscureText = !_obscureText;
-                                  }),
-                                  splashRadius: 20,
+                      child: SingleChildScrollView(
+                        child: Form(
+                          key: _form,
+                          child: Column(
+                            children: [
+                              const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    "Welcome Back!",
+                                    style: TextStyle(
+                                        color: primary,
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                              const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: GradientText(
+                                    text: "Log Back In!",
+                                    textStyle: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900),
+                                  )),
+                              const SizedBox(height: 25),
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  label: const Text("Username"),
+                                  border: const OutlineInputBorder(),
+                                  errorText: _usernameError,
                                 ),
-                                errorText: _passwordError,
-                              ),
-                              onChanged: (_) {
-                                if (_passwordError == null) return;
-                                setState(() {
-                                  _passwordError = null;
-                                });
-                              },
-                              obscureText: _obscureText,
-                              keyboardType: TextInputType.visiblePassword,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Password required!";
-                                }
-                                return null;
-                              },
-                              onSaved: (value) {
-                                _password = value!;
-                              },
-                            ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    PageRouteBuilder(
-                                      transitionDuration:
-                                          const Duration(milliseconds: 1500),
-                                      pageBuilder: (_, __, ___) =>
-                                          const RegisterScreen(),
-                                    ),
-                                  );
+                                onChanged: (_) {
+                                  if (_usernameError == null) return;
+                                  setState(() {
+                                    _usernameError = null;
+                                  });
                                 },
-                                child: Text("Don't Have an account yet?"),
+                                textInputAction: TextInputAction.next,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Username required!";
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value) {
+                                  _username = value!;
+                                },
                               ),
-                            ),
-                            const SizedBox(height: 20),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ActionButton(
-                                onClick: login,
-                                isLoading: _isLoading,
-                                text: "Login!",
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  label: const Text("Password"),
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: IconButton(
+                                    icon: _obscureText
+                                        ? const Icon(Icons.visibility)
+                                        : const Icon(Icons.visibility_off),
+                                    onPressed: () => setState(() {
+                                      _obscureText = !_obscureText;
+                                    }),
+                                    splashRadius: 20,
+                                  ),
+                                  errorText: _passwordError,
+                                ),
+                                onChanged: (_) {
+                                  if (_passwordError == null) return;
+                                  setState(() {
+                                    _passwordError = null;
+                                  });
+                                },
+                                obscureText: _obscureText,
+                                keyboardType: TextInputType.visiblePassword,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Password required!";
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value) {
+                                  _password = value!;
+                                },
                               ),
-                            ),
-                          ],
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => const ForgetPasswordScreen(),
+                                    ),
+                                  ),
+                                  child: const Text("Forgot password?"),
+                                ),
+                              ),
+                              SizedBox(
+                                width: double.infinity,
+                                child: AnimatedBtn(
+                                  text: "Login",
+                                  btnAnimationController: _btnAnimationController,
+                                  isLoading: _isLoading,
+                                  press: () {
+                                    _btnAnimationController.isActive = true;
+                                    login();
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Align(
+                                alignment: Alignment.center,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      PageRouteBuilder(
+                                        transitionDuration:
+                                        const Duration(milliseconds: 1500),
+                                        pageBuilder: (_, __, ___) =>
+                                        const RegisterScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text("Don't Have an account yet?"),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
