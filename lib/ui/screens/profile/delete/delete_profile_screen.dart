@@ -5,6 +5,7 @@ import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dar
 import 'package:food_it_flutter/ui/components/extras/action_button.dart';
 import 'package:food_it_flutter/ui/screens/auth/login_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:rive/rive.dart' as ra;
 
 import '../../../../data/exceptions/default_exception.dart';
 import '../../../../data/exceptions/field_exception.dart';
@@ -118,13 +119,12 @@ Widget build(BuildContext context) {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              ShaderMask(
-                blendMode: BlendMode.srcIn,
-                shaderCallback: (bounds) =>
-                    const LinearGradient(
-                      colors: [Color(0xFFE60000), Color(0xFFFF5E5E)],
-                    ).createShader(bounds),
-                child: const Icon(Icons.warning_rounded, size: 200),
+              Container(
+                height: 300,
+                width: MediaQuery.of(context).size.width,
+                child: const ra.RiveAnimation.asset(
+                    "assets/rive/delete-logistics-man-boxes.riv",
+                animations: ["Idle"],),
               ),
               const Text(
                 'Are you sure you want to delete your account?',

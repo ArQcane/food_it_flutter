@@ -6,6 +6,7 @@ import 'package:food_it_flutter/ui/screens/restaurant/specific_restaurant_screen
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:provider/provider.dart';
+import 'package:rive/rive.dart' as ra;
 
 import '../../../domain/user/user.dart';
 import '../../../providers_viewmodels/restaurant_provider.dart';
@@ -20,6 +21,15 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final _formKey = GlobalKey<FormState>();
   var query = "";
+
+  late ra.RiveAnimationController _controller;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = ra.OneShotAnimation("doggo", autoplay: false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,24 +109,37 @@ class _SearchScreenState extends State<SearchScreen> {
                 token,
               ),
               if (restaurantList.isEmpty)
-                Material(
-                  elevation: 4,
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        Text(
-                          "No restaurants found",
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
-                        Text(
-                          "Try searching for something else",
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                      ],
+                Column(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 220,
+                      child: ra.RiveAnimation.asset(
+                        "assets/rive/search-interactive-ui-doggo.riv",
+                        fit: BoxFit.fill,
+                        animations: ["idle"],
+                      ),
                     ),
-                  ),
+                    Material(
+                      elevation: 4,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+                            Text(
+                              "No restaurants found",
+                              style: Theme.of(context).textTheme.headline6,
+                            ),
+                            Text(
+                              "Try searching for something else",
+                              style: Theme.of(context).textTheme.bodyText1,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               const SizedBox(height: 10),
             ],
@@ -217,9 +240,7 @@ class _SearchScreenState extends State<SearchScreen> {
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
             ),
             children: [
-              TextSpan(
-                text: "$location - $cuisine" + "\n$rating"
-              ),
+              TextSpan(text: "$location - $cuisine" + "\n$rating"),
             ],
           ),
         ),

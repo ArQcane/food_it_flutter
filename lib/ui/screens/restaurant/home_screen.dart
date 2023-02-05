@@ -11,6 +11,7 @@ import 'package:rive/rive.dart';
 import '../../../providers_viewmodels/restaurant_provider.dart';
 import '../../components/extras/gradient_text.dart';
 import '../../components/restaurants/restaurant_card.dart';
+import '../../components/restaurants/restaurant_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -60,8 +61,40 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5),
+                      child: Column(
+                        children: [
+                          Material(
+                            elevation: 3,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                top: 10,
+                                left: 10,
+                              ),
+                              width: MediaQuery.of(context).size.width,
+                              child: Column(
+                                children: [
+                                  GradientText(text: "Welcome Back!", textStyle: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),),
+                                  GradientText(text: authProvider.user!.username, textStyle: TextStyle(fontSize: 32),),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 320,
+                            width: MediaQuery.of(context).size.width,
+                            child: RiveAnimation.asset("assets/rive/home-screen-summertime-ice-cream.riv", fit: BoxFit.scaleDown,),
+                          )
+                        ],
+                      ),
+                    ),
+
                     const Padding(
-                      padding: EdgeInsets.all(5),
+                      padding: EdgeInsets.symmetric(horizontal: 5),
                       child: GradientText(text: "Featured Restaurants"),
                     ),
                     FeaturedRestaurantSection(
@@ -128,21 +161,18 @@ class FeaturedRestaurantSection extends StatelessWidget {
       });
     return SizedBox(
       width: double.infinity,
-      height: 310,
+      height: 270,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         shrinkWrap: true,
         itemBuilder: (context, index) {
           return SizedBox(
-            width: MediaQuery.of(context).size.width / 2,
+            width: MediaQuery.of(context).size.width / 2 + 20,
             child: RestaurantCard(
               toggleFavourite: (toggleFav, restaurantId) {
                 if (toggleFav) {
                   restaurantProvider.toggleRestaurantFavourite(
-                    restaurantId,
-                    currentUser!,
-                    toggleFav
-                  );
+                      restaurantId, currentUser!, toggleFav);
                   return;
                 }
                 restaurantProvider.removeRestaurantFromFavorite(
@@ -197,63 +227,61 @@ class AllRestaurantsSection extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        return Row(
-          children: [
-            Expanded(
-              child: RestaurantCard(
-                toggleFavourite: (toggleFav, restaurantId) {
-                  if (toggleFav) {
-                    restaurantProvider.toggleRestaurantFavourite(
-                        restaurantId,
-                        currentUser!,
-                        toggleFav
+        return SizedBox(
+          width: double.infinity,
+          height: 270,
+          child: Row(
+            children: [
+              Expanded(
+                child: RestaurantCard(
+                  toggleFavourite: (toggleFav, restaurantId) {
+                    if (toggleFav) {
+                      restaurantProvider.toggleRestaurantFavourite(
+                          restaurantId, currentUser!, toggleFav);
+                      return;
+                    }
+                    restaurantProvider.removeRestaurantFromFavorite(
+                      restaurantId,
+                      currentUser!,
                     );
-                    return;
-                  }
-                  restaurantProvider.removeRestaurantFromFavorite(
-                    restaurantId,
-                    currentUser!,
-                  );
-                },
-                currentUser: currentUser,
-                reviewsOfRestaurant: reviewProvider.reviewList.where(
-                  (element) {
-                    return element.review.idrestaurant ==
-                        restaurantList[index][0].restaurant.restaurant_id;
                   },
-                ).toList(),
-                transformedRestaurant: restaurantList[index][0],
+                  currentUser: currentUser,
+                  reviewsOfRestaurant: reviewProvider.reviewList.where(
+                    (element) {
+                      return element.review.idrestaurant ==
+                          restaurantList[index][0].restaurant.restaurant_id;
+                    },
+                  ).toList(),
+                  transformedRestaurant: restaurantList[index][0],
+                ),
               ),
-            ),
-            Expanded(
-              child: restaurantList[index].length == 1
-                  ? Container()
-                  : RestaurantCard(
-                      toggleFavourite: (toggleFav, restaurantId) {
-                        if (toggleFav) {
-                          restaurantProvider.toggleRestaurantFavourite(
-                              restaurantId,
-                              currentUser!,
-                              toggleFav
+              Expanded(
+                child: restaurantList[index].length == 1
+                    ? Container()
+                    : RestaurantCard(
+                        toggleFavourite: (toggleFav, restaurantId) {
+                          if (toggleFav) {
+                            restaurantProvider.toggleRestaurantFavourite(
+                                restaurantId, currentUser!, toggleFav);
+                            return;
+                          }
+                          restaurantProvider.removeRestaurantFromFavorite(
+                            restaurantId,
+                            currentUser!,
                           );
-                          return;
-                        }
-                        restaurantProvider.removeRestaurantFromFavorite(
-                          restaurantId,
-                          currentUser!,
-                        );
-                      },
-                      currentUser: currentUser,
-                      reviewsOfRestaurant: reviewProvider.reviewList.where(
-                        (element) {
-                          return element.review.idrestaurant ==
-                              restaurantList[index][1].restaurant.restaurant_id;
                         },
-                      ).toList(),
-                      transformedRestaurant: restaurantList[index][1],
-                    ),
-            ),
-          ],
+                        currentUser: currentUser,
+                        reviewsOfRestaurant: reviewProvider.reviewList.where(
+                          (element) {
+                            return element.review.idrestaurant ==
+                                restaurantList[index][1].restaurant.restaurant_id;
+                          },
+                        ).toList(),
+                        transformedRestaurant: restaurantList[index][1],
+                      ),
+              ),
+            ],
+          ),
         );
       },
       itemCount: restaurantList.length,

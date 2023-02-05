@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/ui/components/extras/action_button.dart';
+import 'package:food_it_flutter/ui/components/extras/gradient_text.dart';
 import 'package:food_it_flutter/ui/theme/colors.dart';
 import 'package:provider/provider.dart';
+import 'package:rive/rive.dart';
 
 import '../../../../data/exceptions/default_exception.dart';
 import '../../../../data/exceptions/field_exception.dart';
@@ -31,8 +33,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     setState(() {
       _isUpdatingPassword = true;
     });
-    var authProvider = Provider.of<AuthenticationProvider>(
-        context, listen: false);
+    var authProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
     try {
       await authProvider.login(authProvider.user!.username, oldPassword);
     } on DefaultException catch (e) {
@@ -43,7 +45,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       return;
     } on FieldException catch (e) {
       var passwordError = e.fieldErrors.where(
-            (element) => element.field == 'password',
+        (element) => element.field == 'password',
       );
       setState(() {
         if (passwordError.length == 1) {
@@ -76,7 +78,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         _isUpdatingPassword = false;
         _onSucceed = true;
       });
-      await Future.delayed(Duration(seconds: 1, milliseconds: 500));
+      await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
       setState(() {
         _onSucceed = false;
       });
@@ -91,7 +93,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       });
     } on FieldException catch (e) {
       var passwordError = e.fieldErrors.where(
-            (element) => element.field == 'password',
+        (element) => element.field == 'password',
       );
       setState(() {
         _isUpdatingPassword = false;
@@ -121,15 +123,24 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             key: _formKey,
             child: Column(
               children: [
-                ShaderMask(
-                  shaderCallback: (bounds) =>
-                      const LinearGradient(
-                        colors: [primaryAccent, primary],
-                      ).createShader(bounds),
-                  child: const Icon(
-                    Icons.lock,
-                    size: 200,
-                  ),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      height: 300,
+                      width: MediaQuery.of(context).size.width,
+                      child: const RiveAnimation.asset(
+                          "assets/rive/update-password.riv"),
+                    ),
+                    Positioned(
+                      bottom: 30,
+                        child: GradientText(
+                      text: "Please enter current password of the account",
+                      textStyle: TextStyle(
+                        fontSize: 18
+                      ),
+                    ))
+                  ],
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -166,8 +177,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                if(_onSucceed)
-                  RiveAnimationCheck()
+                if (_onSucceed)
+                  const RiveAnimationCheck()
                 else
                   ActionButton(
                     onClick: submit,
