@@ -87,7 +87,6 @@ Widget _buildFavRestaurantSection(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const GradientText(text: "Favorite Restaurants"),
           const SizedBox(height: 5),
           ...chunkedFavoriteRestaurants.map(
             (restaurantRow) => Column(
@@ -95,23 +94,27 @@ Widget _buildFavRestaurantSection(
                 Row(
                   children: [
                     Expanded(
-                      child: RestaurantCard(
-                        transformedRestaurant: restaurantRow[0],
-                        reviewsOfRestaurant: reviewsProvider.reviewList
-                            .where(
-                              (element) =>
-                                  element.review.idrestaurant ==
-                                  restaurantRow[0].restaurant.restaurant_id,
-                            )
-                            .toList(),
-                        currentUser: currentUser,
-                        toggleFavourite: (shouldFavorite, restaurantId) {
-                          restaurantsProvider.toggleRestaurantFavourite(
-                            restaurantId,
-                            currentUser!,
-                            shouldFavorite,
-                          );
-                        },
+                      child: SizedBox(
+                        height: 280,
+                        child: RestaurantCard(
+
+                          transformedRestaurant: restaurantRow[0],
+                          reviewsOfRestaurant: reviewsProvider.reviewList
+                              .where(
+                                (element) =>
+                                    element.review.idrestaurant ==
+                                    restaurantRow[0].restaurant.restaurant_id,
+                              )
+                              .toList(),
+                          currentUser: currentUser,
+                          toggleFavourite: (shouldFavorite, restaurantId) {
+                            restaurantsProvider.toggleRestaurantFavourite(
+                              restaurantId,
+                              currentUser!,
+                              shouldFavorite,
+                            );
+                          },
+                        ),
                       ),
                     ),
                     Expanded(

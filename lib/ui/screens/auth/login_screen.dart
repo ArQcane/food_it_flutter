@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen>
             Navigator.of(context).pushReplacement(
               PageRouteBuilder(
                 transitionDuration: const Duration(milliseconds: 1500),
-                pageBuilder: (_, __, ___) => const MainScreen(),
+                pageBuilder: (_, __, ___) => MainScreen(sideBarIndex: 0,),
               ),
             );
           });

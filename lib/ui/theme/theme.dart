@@ -7,6 +7,9 @@ var lightTheme = ThemeData.light().copyWith(
   ),
   appBarTheme: const AppBarTheme(backgroundColor: primary, elevation: 4),
   scaffoldBackgroundColor: const Color(0xFFFFF5E4),
+  textTheme: ThemeData.light().textTheme.apply(
+    fontFamily: 'OpenSans',
+  ),
 );
 
 var darkTheme = ThemeData.dark().copyWith(

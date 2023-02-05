@@ -89,6 +89,12 @@ flutter:
     - family: BungeeShade
       fonts:
           - asset: assets/font/BungeeShade-Regular.ttf
+    - family: OpenSans
+      fonts:
+        -  asset: assets/font/OpenSans-Regular.ttf
+    - family: Montserrat
+      fonts:
+        - asset: assets/font/Montserrat-Regular.ttf
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

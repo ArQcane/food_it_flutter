@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 1500),
-        pageBuilder: (_, __, ___) => const MainScreen(),
+        pageBuilder: (_, __, ___) => MainScreen(sideBarIndex: 0,),
       ),
     );
   }

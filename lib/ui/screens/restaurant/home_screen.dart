@@ -26,8 +26,11 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          currentUser == null ? "Loading..." : "Home",
+        title: Padding(
+          padding: EdgeInsets.only(left: 48),
+          child: Text(
+            currentUser == null ? "Loading..." : "Home",
+          ),
         ),
         actions: [
           IconButton(
@@ -161,7 +164,7 @@ class FeaturedRestaurantSection extends StatelessWidget {
       });
     return SizedBox(
       width: double.infinity,
-      height: 270,
+      height: 280,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         shrinkWrap: true,
@@ -229,7 +232,7 @@ class AllRestaurantsSection extends StatelessWidget {
       itemBuilder: (context, index) {
         return SizedBox(
           width: double.infinity,
-          height: 270,
+          height: 280,
           child: Row(
             children: [
               Expanded(

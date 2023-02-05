@@ -155,7 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => const MainScreen(),
+        builder: (_) => MainScreen(sideBarIndex: 0,),
       ),
     );
   }

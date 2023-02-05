@@ -417,11 +417,11 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
             Padding(
               padding: const EdgeInsets.all(5),
               child: LinearPercentIndicator(
-                width: MediaQuery.of(context).size.width - 215,
+                width: MediaQuery.of(context).size.width - 225,
                 animation: true,
                 animateFromLastPercent: true,
                 lineHeight: 12.0,
-                animationDuration: 1000,
+                animationDuration: 600,
                 trailing: const Icon(
                   Icons.person_pin_circle,
                   color: primary,
@@ -540,10 +540,11 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(5),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: Text(
                       transformedRestaurant.restaurant.restaurant_name,
                       style: TextStyle(
+                        fontSize: 20,
                         color: color,
                       ),
                     ),
@@ -556,7 +557,7 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                   ),
                 ),
           background: Image.network(
-            transformedRestaurant.restaurant.restaurant_logo,
+            transformedRestaurant.restaurant.restaurant_banner,
             fit: BoxFit.cover,
           ),
         ),

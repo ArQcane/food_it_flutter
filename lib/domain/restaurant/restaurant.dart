@@ -44,7 +44,7 @@ class Restaurant {
     location_lat = json['location_lat'].toDouble();
     location_long = json['location_long'].toDouble();
     location = json['location'];
-    restaurant_banner = json['restaurant_banner'];
+    restaurant_banner = NetworkUtils.baseUrl + json['restaurant_banner'];
   }
 
   Map<String, dynamic> toJson() {

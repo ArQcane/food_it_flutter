@@ -96,152 +96,183 @@ class RestaurantCard extends StatelessWidget {
             border: Border.all(width: 0.1, color: primary),
             borderRadius: AppDefaults.borderRadius,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
             children: [
-              Stack(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: 130,
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Image.network(
-                          transformedRestaurant.restaurant.restaurant_logo,
-                          fit: BoxFit.fill,
+                  Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: 130,
+                          child: AspectRatio(
+                            aspectRatio: 1,
+                            child: Image.network(
+                              transformedRestaurant.restaurant.restaurant_banner,
+                              fit: BoxFit.fill,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      Container(
+                        height: 130,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            gradient: LinearGradient(
+                                begin: FractionalOffset.center,
+                                end: FractionalOffset.bottomCenter,
+                                colors: [
+                                  Colors.white.withOpacity(0.1),
+                                  primaryAccent.withOpacity(0.3),
+                                ],
+                                stops: [
+                                  0.0,
+                                  1.0
+                                ])),
+                      )
+                    ],
                   ),
+                  const SizedBox(height: 24),
                   Container(
-                    height: 130,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        gradient: LinearGradient(
-                            begin: FractionalOffset.center,
-                            end: FractionalOffset.bottomCenter,
-                            colors: [
-                              Colors.white.withOpacity(0.1),
-                              primaryAccent.withOpacity(0.3),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: AppDefaults.padding),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                transformedRestaurant
+                                    .restaurant.restaurant_name,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6
+                                    ?.copyWith(color: primary),
+                              ),
+                              Text(
+                                transformedRestaurant.restaurant.cuisine,
+                              ),
                             ],
-                            stops: [
-                              0.0,
-                              1.0
-                            ])),
+                          ),
+                          SizedBox(
+                            height: 4,
+                          ),
+                          Container(
+                            child: Row(
+                              children: [
+                                const Icon(Icons.star, color: primary),
+                                const SizedBox(width: 4),
+                                Text(
+                                  averageRating.toStringAsFixed(1),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  " (${reviewsOfRestaurant.length})",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Spacer(),
+                                IconButton(
+                                  padding: EdgeInsets.all(2),
+                                  constraints: BoxConstraints(),
+                                  onPressed: () {
+                                    toggleFavourite(
+                                      !isFavouritedByCurrentUser,
+                                      transformedRestaurant
+                                          .restaurant.restaurant_id
+                                          .toString(),
+                                    );
+                                  },
+                                  icon: ShaderMask(
+                                    blendMode: BlendMode.srcIn,
+                                    shaderCallback: (bounds) {
+                                      return const LinearGradient(
+                                        colors: [primaryAccent, primary],
+                                      ).createShader(
+                                        Rect.fromLTWH(
+                                            0, 0, bounds.width, bounds.height),
+                                      );
+                                    },
+                                    child: Icon(
+                                      isFavouritedByCurrentUser
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                    ),
+                                  ),
+                                  splashRadius: 20,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Stack(
+                            children: [
+                              Positioned(
+                                child: Row(
+                                  children: [
+                                    Row(
+                                      children: List.generate(
+                                          transformedRestaurant
+                                              .restaurant.average_price_range
+                                              .toInt(),
+                                          (index) => Icon(
+                                                Icons.attach_money,
+                                                color: primary,
+                                                size: 20,
+                                              )),
+                                    ),
+                                    Row(
+                                      children: List.generate(
+                                          5 -
+                                              transformedRestaurant.restaurant
+                                                  .average_price_range
+                                                  .toInt(),
+                                          (index) => Icon(
+                                                Icons.attach_money,
+                                                color: Colors.grey,
+                                                size: 20,
+                                              )),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ]),
                   )
                 ],
               ),
-              const SizedBox(height: 8),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: AppDefaults.padding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        transformedRestaurant.restaurant.restaurant_name,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline5
-                            ?.copyWith(color: primary),
-                      ),
-                      Text(
-                        transformedRestaurant.restaurant.cuisine,
-                      ),
-                    ],
+              Positioned(
+                top: 95,
+                left: 15,
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color:
+                      primary
+                      ,
+                      width: 2,
+                    ),
+                    shape: BoxShape.circle,
                   ),
-                  SizedBox(height: 4,),
-                  Container(
-                    child: Row(
-                      children: [
-                        const Icon(Icons.star, color: primary),
-                        const SizedBox(width: 4),
-                        Text(
-                          averageRating.toStringAsFixed(1),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          " (${reviewsOfRestaurant.length})",
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                        Spacer(),
-                        IconButton(
-                          padding: EdgeInsets.all(2),
-                          constraints: BoxConstraints(),
-                          onPressed: () {
-                            toggleFavourite(
-                              !isFavouritedByCurrentUser,
-                              transformedRestaurant.restaurant.restaurant_id
-                                  .toString(),
-                            );
-                          },
-                          icon: ShaderMask(
-                            blendMode: BlendMode.srcIn,
-                            shaderCallback: (bounds) {
-                              return const LinearGradient(
-                                colors: [primaryAccent, primary],
-                              ).createShader(
-                                Rect.fromLTWH(
-                                    0, 0, bounds.width, bounds.height),
-                              );
-                            },
-                            child: Icon(
-                              isFavouritedByCurrentUser
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                            ),
-                          ),
-                          splashRadius: 20,
-                        ),
-                      ],
+                  child: ClipOval(
+                    child: Image.network(
+                      transformedRestaurant.restaurant.restaurant_logo
                     ),
                   ),
-                  Stack(
-                    children: [
-                      Positioned(
-                        child: Row(
-                          children: [
-                            Row(
-                              children: List.generate(
-                                  transformedRestaurant
-                                      .restaurant.average_price_range
-                                      .toInt(),
-                                  (index) => Icon(
-                                        Icons.attach_money,
-                                        color: primary,
-                                        size: 20,
-                                      )),
-                            ),
-                            Row(
-                              children: List.generate(
-                                  5 -
-                                      transformedRestaurant
-                                          .restaurant.average_price_range
-                                          .toInt(),
-                                  (index) => Icon(
-                                        Icons.attach_money,
-                                        color: Colors.grey,
-                                        size: 20,
-                                      )),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ]),
-              )
+                ),
+              ),
             ],
           ),
         ),
