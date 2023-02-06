@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
 import '../../../providers_viewmodels/restaurant_provider.dart';
 import '../../components/extras/gradient_text.dart';
+import '../../components/extras/rive_animations/rive_isLoading_card.dart';
 import '../../components/restaurants/restaurant_card.dart';
 import '../../components/restaurants/restaurant_card.dart';
 
@@ -50,9 +51,8 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: restaurantProvider.isLoading
-          ? Container(
-              alignment: Alignment.center,
-              child: const CircularProgressIndicator(),
+          ? RiveIsLoadingContainer(
+
             )
           : RefreshIndicator(
               onRefresh: () async {
@@ -82,7 +82,7 @@ class HomeScreen extends StatelessWidget {
                               child: Column(
                                 children: [
                                   GradientText(text: "Welcome Back!", textStyle: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),),
-                                  GradientText(text: authProvider.user!.username, textStyle: TextStyle(fontSize: 32),),
+                                  GradientText(text: authProvider.user !=  null ?authProvider.user!.username: "Loading...", textStyle: TextStyle(fontSize: 32),),
                                 ],
                               ),
                             ),

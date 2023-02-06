@@ -141,18 +141,17 @@ class AuthenticationProvider extends ChangeNotifier {
     );
     notifyListeners();
   }
-
   Future<void> deleteAccount(String userId) async {
     if (token == null) {
       throw UnauthenticatedException();
     }
     await _userRepo.deleteUser(
-      userId: userId,
+      userId: userId
     );
-    await logOut();
     _userProvider.users = _userProvider.users.where((e) {
       return e.user_id != user!.user_id;
     }).toList();
     _userProvider.notifyListeners();
+    await logOut();
   }
 }

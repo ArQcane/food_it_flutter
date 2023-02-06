@@ -25,6 +25,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   var _isLoading = false;
 
   void submit() async {
+    var authProvider = Provider.of<AuthenticationProvider>(
+        context, listen: false);
     FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
@@ -32,9 +34,17 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       _isLoading = true;
     });
     try {
-      var authProvider = Provider.of<AuthenticationProvider>(
-          context, listen: false);
       await authProvider.login(authProvider.user!.username, _password);
+      setState((){
+        _isLoading = false;
+      });
+      await authProvider.deleteAccount(authProvider.user!.user_id.toString());
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(animate: false),
+        ),
+            (_) => false,
+      );
     } on DefaultException catch (e) {
       setState(() {
         _passwordError = e.error;
@@ -59,49 +69,6 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
         ),
       );
       return;
-    }
-    try {
-      var authProvider = Provider.of<AuthenticationProvider>(
-          context, listen: false);
-      await authProvider.deleteAccount(authProvider.user!.user_id.toString());
-      setState((){
-        _isLoading = false;
-      });
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => const LoginScreen(animate: false),
-        ),
-            (_) => false,
-      );
-    } on FieldException catch (e) {
-      var passwordError = e.fieldErrors.where(
-            (element) => element.field == 'password',
-      );
-      setState(() {
-        if (passwordError.length == 1) {
-          _passwordError = passwordError.first.error;
-        }
-        _isLoading = false;
-      });
-    } on DefaultException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.error),
-        ),
-      );
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (e) {
-      log(e.toString());
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Something went wrong'),
-        ),
-      );
-      setState(() {
-        _isLoading = false;
-      });
     }
 }
 

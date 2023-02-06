@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:food_it_flutter/providers_viewmodels/authentication_provider.dart';
 import 'package:food_it_flutter/ui/screens/restaurant/home_screen.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/exceptions/default_exception.dart';
@@ -21,6 +24,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  bool _isUpdatingImage = false;
   final GlobalKey<FormState> _firstStageFormKey = GlobalKey();
   final GlobalKey<FormState> _secondStageFormKey = GlobalKey();
   final GlobalKey<FormState> _thirdStageFormKey = GlobalKey();
@@ -155,7 +159,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => MainScreen(sideBarIndex: 0,),
+        builder: (_) => MainScreen(
+          sideBarIndex: 0,
+        ),
       ),
     );
   }
@@ -381,9 +387,8 @@ class _RegisterFirstStageState extends State<RegisterFirstStage> {
                     alignment: Alignment.centerLeft,
                     child: GradientText(
                       text: "Make a new Account!",
-                      textStyle: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900),
+                      textStyle:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                     )),
                 const SizedBox(height: 25),
                 TextFormField(
@@ -445,6 +450,10 @@ class _RegisterFirstStageState extends State<RegisterFirstStage> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Gender required!";
+                    }
+                    var regex = RegExp(genderRegex);
+                    if (!regex.hasMatch(value)) {
+                      return "Please enter either M(male) or F(female)";
                     }
                     return null;
                   },
@@ -725,8 +734,12 @@ class RegisterThirdStage extends StatefulWidget {
 }
 
 class _RegisterThirdStageState extends State<RegisterThirdStage> {
+  bool _isUpdatingImage = false;
+  String? base64String = null;
+
   @override
   Widget build(BuildContext context) {
+    var authProvider = Provider.of<AuthenticationProvider>(context);
     return SingleChildScrollView(
       child: Card(
         shape: const RoundedRectangleBorder(
@@ -762,6 +775,10 @@ class _RegisterThirdStageState extends State<RegisterThirdStage> {
                     if (value == null || value.isEmpty) {
                       return "Mobile Number required!";
                     }
+                    var regex = RegExp(mobileRegex);
+                    if (!regex.hasMatch(value)) {
+                      return "Number should start with 65 and have 8 digits";
+                    }
                     return null;
                   },
                   onSaved: (value) {
@@ -791,7 +808,96 @@ class _RegisterThirdStageState extends State<RegisterThirdStage> {
                   },
                 ),
                 const SizedBox(height: 15),
+                Stack(
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: primary,
+                          width: 2,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: _isUpdatingImage
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? primaryAccent
+                                    : Colors.white,
+                              ),
+                            )
+                          : base64String == null
+                              ? const Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 100,
+                                )
+                              : ClipOval(
+                                  child: authProvider
+                                      .imageFromBase64String(base64String!),
+                                ),
+                    ),
+                    Positioned(
+                      bottom: 5,
+                      right: 5,
+                      child: Material(
+                        elevation: 4,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? ElevationOverlay.colorWithOverlay(
+                                Theme.of(context).colorScheme.surface,
+                                Colors.white,
+                                50,
+                              )
+                            : Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        clipBehavior: Clip.hardEdge,
+                        child: InkWell(
+                          onTap: () async {
+                            var picker = ImagePicker();
+                            var image = await picker.pickImage(
+                              source: ImageSource.gallery,
+                            );
+                            if (image == null) return;
+                            setState(() {
+                              _isUpdatingImage = true;
+                            });
+                            var bytes = await image.readAsBytes();
+                            var base64img = base64Encode(bytes);
+                            widget.onProfilePicSaved(base64img);
+                            setState(() {
+                              _isUpdatingImage = false;
+                              base64String = base64img;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(3),
+                            child: ShaderMask(
+                              blendMode: BlendMode.srcIn,
+                              shaderCallback: (rect) {
+                                return const LinearGradient(
+                                  colors: [primaryAccent, primary],
+                                ).createShader(
+                                  Rect.fromLTWH(0, 0, rect.width, rect.height),
+                                );
+                              },
+                              child: const Icon(
+                                Icons.camera_alt,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
                 TextFormField(
+                  readOnly: true,
+                  controller: TextEditingController(text: base64String),
                   decoration: InputDecoration(
                     label: const Text("Profile Picture"),
                     border: const OutlineInputBorder(),
@@ -808,6 +914,7 @@ class _RegisterThirdStageState extends State<RegisterThirdStage> {
                     }
                     return null;
                   },
+
                   onSaved: (value) {
                     widget.onProfilePicSaved(value!);
                   },
