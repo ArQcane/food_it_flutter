@@ -34,9 +34,6 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     var restaurantProvider = Provider.of<RestaurantProvider>(context);
-    var authProvider = Provider.of<AuthenticationProvider>(context);
-    var currentUser = authProvider.user!;
-    var token = authProvider.token!;
     var restaurantList = restaurantProvider.restaurantList
         .where(
           (element) => element.restaurant.restaurant_name
@@ -68,6 +65,7 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Form(
               key: _formKey,
               child: TextFormField(
+                key: const ValueKey('search-input'),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: IconButton(
@@ -104,9 +102,9 @@ class _SearchScreenState extends State<SearchScreen> {
               const SizedBox(height: 10),
               _buildRestaurantCards(
                 restaurantList,
-                currentUser,
+
                 restaurantProvider,
-                token,
+
               ),
               if (restaurantList.isEmpty)
                 Column(
@@ -151,69 +149,80 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildRestaurantCards(
     List<TransformedRestaurant> restaurantList,
-    User currentUser,
-    RestaurantProvider restaurantProvider,
-    String token,
-  ) {
-    return Column(
-      children: restaurantList.map(
-        (e) {
-          var isFavoritedByCurrentUser = e.usersWhoFavRestaurant.any(
-            (element) => element.userId == currentUser.user_id,
-          );
 
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: OpenContainer(
-              closedBuilder: (context, openContainer) {
-                return _buildSearchCard(
-                  leadingImageUrl: e.restaurant.restaurant_logo,
-                  title: e.restaurant.restaurant_name,
-                  location: e.restaurant.location,
-                  rating: e.restaurant.average_rating.toString(),
-                  cuisine: e.restaurant.cuisine,
-                  onTap: openContainer,
-                  trailing: ShaderMask(
-                    blendMode: BlendMode.srcIn,
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [primaryAccent, primary],
-                    ).createShader(bounds),
-                    child: IconButton(
-                      splashRadius: 20,
-                      icon: Icon(
-                        isFavoritedByCurrentUser
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                      ),
-                      onPressed: () {
-                        restaurantProvider.toggleRestaurantFavourite(
-                          e.restaurant.restaurant_id.toString(),
-                          currentUser,
-                          !isFavoritedByCurrentUser,
-                        );
-                      },
+    RestaurantProvider restaurantProvider,
+
+  ) {
+    return Consumer<AuthenticationProvider>(
+        builder: (context, provider, child) {
+          var currentUser = provider.user;
+          var token = provider.token;
+
+          return Column(
+            children: restaurantList.map(
+                  (e) {
+                var isFavoritedByCurrentUser = e.usersWhoFavRestaurant.any(
+                      (element) => element.userId == currentUser?.user_id,
+                );
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: OpenContainer(
+                    closedBuilder: (context, openContainer) {
+                      return _buildSearchCard(
+                        location: e.restaurant.location,
+                        cuisine: e.restaurant.cuisine,
+                        rating: e.restaurant.average_rating.toString(),
+                        leadingImageUrl: e.restaurant.restaurant_logo,
+                        title: e.restaurant.restaurant_name,
+                        onTap: openContainer,
+                        trailing: ShaderMask(
+                          blendMode: BlendMode.srcIn,
+                          shaderCallback: (bounds) =>
+                              const LinearGradient(
+                                colors: [primaryAccent, primary],
+                              ).createShader(bounds),
+                          child: IconButton(
+                            splashRadius: 20,
+                            icon: Icon(
+                              isFavoritedByCurrentUser
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                            ),
+                            onPressed: () {
+                              restaurantProvider.toggleRestaurantFavourite(
+                                e.restaurant.restaurant_id.toString(),
+                                currentUser!,
+                                !isFavoritedByCurrentUser,
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    closedColor: ElevationOverlay.colorWithOverlay(
+                      Theme
+                          .of(context)
+                          .colorScheme
+                          .surface,
+                      Colors.white,
+                      4,
                     ),
+                    closedElevation: 4,
+                    openElevation: 0,
+                    transitionDuration: const Duration(milliseconds: 500),
+                    transitionType: ContainerTransitionType.fadeThrough,
+                    openBuilder: (context, _) {
+                      return SpecificRestaurantScreen(
+                        restaurantId: e.restaurant.restaurant_id.toString(),
+                      );
+                    },
                   ),
                 );
               },
-              closedColor: ElevationOverlay.colorWithOverlay(
-                Theme.of(context).colorScheme.surface,
-                Colors.white,
-                4,
-              ),
-              closedElevation: 4,
-              openElevation: 0,
-              transitionDuration: const Duration(milliseconds: 500),
-              transitionType: ContainerTransitionType.fadeThrough,
-              openBuilder: (context, _) {
-                return SpecificRestaurantScreen(
-                  restaurantId: e.restaurant.restaurant_id.toString(),
-                );
-              },
-            ),
+            ).toList(),
           );
-        },
-      ).toList(),
+        }
     );
   }
 
@@ -230,6 +239,7 @@ class _SearchScreenState extends State<SearchScreen> {
     var endQueryIndex = startQueryIndex + query.length;
 
     return InkWell(
+      key: const ValueKey("search-card"),
       onTap: onTap,
       child: ListTile(
         isThreeLine: true,

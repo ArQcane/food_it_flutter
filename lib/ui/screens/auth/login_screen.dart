@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen>
         error.fire();
         await Future.delayed(
           const Duration(seconds: 2),
-              () {
+          () {
             setState(() {
               isShowLoading = false;
             });
@@ -120,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen>
       success.fire();
       Future.delayed(
         const Duration(seconds: 2),
-            () {
+        () {
           confetti.fire();
           // Navigate & hide confetti
           Future.delayed(const Duration(seconds: 1), () {
@@ -132,7 +132,9 @@ class _LoginScreenState extends State<LoginScreen>
             Navigator.of(context).pushReplacement(
               PageRouteBuilder(
                 transitionDuration: const Duration(milliseconds: 1500),
-                pageBuilder: (_, __, ___) => MainScreen(sideBarIndex: 0,),
+                pageBuilder: (_, __, ___) => MainScreen(
+                  sideBarIndex: 0,
+                ),
               ),
             );
           });
@@ -218,30 +220,30 @@ class _LoginScreenState extends State<LoginScreen>
               ),
               isShowLoading
                   ? CustomPositioned(
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  child: RiveAnimation.asset(
-                    'assets/rive/check.riv',
-                    fit: BoxFit.fill,
-                    onInit: _onCheckRiveInit,
-                  ),
-                ),
-              )
+                      child: Container(
+                        width: 200,
+                        height: 200,
+                        child: RiveAnimation.asset(
+                          'assets/rive/check.riv',
+                          fit: BoxFit.fill,
+                          onInit: _onCheckRiveInit,
+                        ),
+                      ),
+                    )
                   : const SizedBox(),
-                isShowConfetti
-                    ? CustomPositioned(
-                  child: Container(
-                    width: 250,
-                    height: 250,
-                    child: RiveAnimation.asset(
-                      'assets/rive/4060-8417-confetti.riv',
-                      fit: BoxFit.fill,
-                      onInit: _onConfettiRiveInit,
-                    ),
-                  ),
-                )
-                    : const SizedBox(),
+              isShowConfetti
+                  ? CustomPositioned(
+                      child: Container(
+                        width: 250,
+                        height: 250,
+                        child: RiveAnimation.asset(
+                          'assets/rive/4060-8417-confetti.riv',
+                          fit: BoxFit.fill,
+                          onInit: _onConfettiRiveInit,
+                        ),
+                      ),
+                    )
+                  : const SizedBox(),
               Align(
                 alignment: widget.animate
                     ? Alignment(0, _animation?.value ?? 3.5)
@@ -260,128 +262,136 @@ class _LoginScreenState extends State<LoginScreen>
                         vertical: 20,
                         horizontal: 20,
                       ),
-                      child: SingleChildScrollView(
-                        child: Form(
-                          key: _form,
-                          child: Column(
-                            children: [
-                              const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    "Welcome Back!",
-                                    style: TextStyle(
-                                        color: primary,
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold),
-                                  )),
-                              const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: GradientText(
-                                    text: "Log Back In!",
-                                    textStyle: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w900),
-                                  )),
-                              const SizedBox(height: 25),
-                              TextFormField(
-                                decoration: InputDecoration(
-                                  label: const Text("Username"),
-                                  border: const OutlineInputBorder(),
-                                  errorText: _usernameError,
-                                ),
-                                onChanged: (_) {
-                                  if (_usernameError == null) return;
-                                  setState(() {
-                                    _usernameError = null;
-                                  });
-                                },
-                                textInputAction: TextInputAction.next,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return "Username required!";
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _username = value!;
-                                },
+                      child: Form(
+                        key: _form,
+                        child: Column(
+                          children: [
+                            const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "Welcome Back!",
+                                  style: TextStyle(
+                                      color: primary,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                            const Align(
+                                alignment: Alignment.centerLeft,
+                                child: GradientText(
+                                  text: "Log Back In!",
+                                  textStyle: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900),
+                                )),
+                            SizedBox(height: 10,),
+                            TextFormField(
+                              key: const ValueKey('login-username-input'),
+                              decoration: InputDecoration(
+                                label: const Text("Username"),
+                                border: const OutlineInputBorder(),
+                                errorText: _usernameError,
                               ),
-                              const SizedBox(height: 20),
-                              TextFormField(
-                                decoration: InputDecoration(
-                                  label: const Text("Password"),
-                                  border: const OutlineInputBorder(),
-                                  suffixIcon: IconButton(
-                                    icon: _obscureText
-                                        ? const Icon(Icons.visibility)
-                                        : const Icon(Icons.visibility_off),
-                                    onPressed: () => setState(() {
-                                      _obscureText = !_obscureText;
-                                    }),
-                                    splashRadius: 20,
-                                  ),
-                                  errorText: _passwordError,
+                              onChanged: (_) {
+                                if (_usernameError == null) return;
+                                setState(() {
+                                  _usernameError = null;
+                                });
+                              },
+                              textInputAction: TextInputAction.next,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Username required!";
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _username = value!;
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            TextFormField(
+                              key: const ValueKey('login-password-input'),
+                              decoration: InputDecoration(
+                                label: const Text("Password"),
+                                border: const OutlineInputBorder(),
+                                suffixIcon: IconButton(
+                                  icon: _obscureText
+                                      ? const Icon(Icons.visibility)
+                                      : const Icon(Icons.visibility_off),
+                                  onPressed: () => setState(() {
+                                    _obscureText = !_obscureText;
+                                  }),
+                                  splashRadius: 20,
                                 ),
-                                onChanged: (_) {
-                                  if (_passwordError == null) return;
-                                  setState(() {
-                                    _passwordError = null;
-                                  });
-                                },
-                                obscureText: _obscureText,
-                                keyboardType: TextInputType.visiblePassword,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return "Password required!";
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _password = value!;
-                                },
+                                errorText: _passwordError,
                               ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton(
-                                  onPressed: () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => const ForgetPasswordScreen(),
-                                    ),
-                                  ),
-                                  child: const Text("Forgot password?"),
-                                ),
-                              ),
-                              SizedBox(
-                                width: double.infinity,
-                                child: AnimatedBtn(
-                                  text: "Login",
-                                  btnAnimationController: _btnAnimationController,
-                                  isLoading: _isLoading,
-                                  press: () {
-                                    _btnAnimationController.isActive = true;
-                                    login();
-                                  },
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Align(
-                                alignment: Alignment.center,
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                      PageRouteBuilder(
-                                        transitionDuration:
-                                        const Duration(milliseconds: 1500),
-                                        pageBuilder: (_, __, ___) =>
-                                        const RegisterScreen(),
+                              onChanged: (_) {
+                                if (_passwordError == null) return;
+                                setState(() {
+                                  _passwordError = null;
+                                });
+                              },
+                              obscureText: _obscureText,
+                              keyboardType: TextInputType.visiblePassword,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Password required!";
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _password = value!;
+                              },
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Align(
+                                  alignment: Alignment.topRight,
+                                  child: TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const ForgetPasswordScreen(),
                                       ),
-                                    );
-                                  },
-                                  child: Text("Don't Have an account yet?"),
+                                    ),
+                                    child: const Text("Forgot password?"),
+                                  ),
                                 ),
+                                Align(
+                                  alignment: Alignment.topLeft,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        PageRouteBuilder(
+                                          transitionDuration: const Duration(
+                                              milliseconds: 1500),
+                                          pageBuilder: (_, __, ___) =>
+                                              const RegisterScreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text("Don't Have an account yet?"),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              width: double.infinity,
+                              child: AnimatedBtn(
+                                key: const ValueKey("login-button"),
+                                text: "Login",
+                                btnAnimationController:
+                                    _btnAnimationController,
+                                isLoading: _isLoading,
+                                press: () {
+                                  _btnAnimationController.isActive = true;
+                                  login();
+                                },
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -396,8 +406,6 @@ class _LoginScreenState extends State<LoginScreen>
   }
 }
 
-
-
 class CustomPositioned extends StatelessWidget {
   const CustomPositioned({super.key, this.scale = 1, required this.child});
 
@@ -409,8 +417,8 @@ class CustomPositioned extends StatelessWidget {
     return Positioned.fill(
       child: Align(
           alignment: Alignment.topCenter,
-          child: Padding(padding: EdgeInsets.fromLTRB(0,150,0,0),child: child)
-      ),
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 150, 0, 0), child: child)),
     );
   }
 }
