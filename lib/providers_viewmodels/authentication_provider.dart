@@ -19,13 +19,13 @@ class AuthenticationProvider extends ChangeNotifier {
 
   AuthenticationProvider(this._userRepo,this._userProvider) {
     (() async {
+      await getAllUsersInDatabase();
       try {
         await retrieveToken();
       } on UnauthenticatedException {
         return;
       }
       await getCurrentLoggedInUser();
-      await getAllUsersInDatabase();
     })();
   }
 

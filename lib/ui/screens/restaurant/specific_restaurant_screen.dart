@@ -60,6 +60,7 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
       (element) =>
           element.restaurant.restaurant_id.toString() == widget.restaurantId,
     );
+
     var reviewsOfRestaurant = reviewProvider.reviewList
         .where((e) => e.review.idrestaurant.toString() == widget.restaurantId)
         .toList();
@@ -427,7 +428,8 @@ class _SpecificRestaurantScreenState extends State<SpecificRestaurantScreen> {
                   color: primary,
                   size: 30,
                 ),
-                percent: transformedRestaurant.usersWhoFavRestaurant.length /
+                percent: authProvider.allUsersInDB.length == 0 ? transformedRestaurant.usersWhoFavRestaurant.length / 1:
+                  transformedRestaurant.usersWhoFavRestaurant.length /
                     authProvider.allUsersInDB.length,
                 barRadius: const Radius.circular(16),
                 progressColor: primary,
